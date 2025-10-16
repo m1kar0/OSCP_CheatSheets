@@ -10,16 +10,6 @@
 6. Look for kernerl modules vulnerabilities
 7. Finally, check if kernel version is vulnerable. Typically it iis the last thing to do because it can break the whole system.
 
-### Linux useful commands for use
-
-```bash
-
-#replace all new lines with commas and overwrite the file
-sed -i ':a;N;$!ba;s/\n/,/g' input_file.txt
-
-
-```
-
 ### Key manual commands for enumeration
 
 ```bash 

