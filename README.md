@@ -1,18 +1,9 @@
 # Motivation
 
-During my preparation for OSCP I have noticed that there are plenty of guides but not all of them provide clear steps for solivng the problem.
+## DEPRECATED
+THIS GUIDE IS DEPRECATED I AM GOING TO BUILD NEW ONE SOON. STAY TUNED! 
+And thanks for all appreciations until now.
 
-So I have decided to write this OSCP Cook Book to help takle all possible problems that you may encounter during the exam.
-
-## How-To
-
-1. Read the cheat sheets to understand the problem and find a solution: https://github.com/jonnyzar/OSCP_Tools/tree/main/Cheat_Sheets
-2. Use tools 
-3. Contribute to this repository if you have a better tool
-
-### Web 
-
-The web part within this cheatsheet exceeds the needs of the OSCP exam but is beneficial for any Bug Bounty hunting. But I leave it to you to figure out what is needed and what is not.
 
 ## Warning
 
