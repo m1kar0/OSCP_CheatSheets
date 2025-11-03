@@ -24,7 +24,7 @@ amass enum -active -d $domain -brute -w $sub_domains -o $domain.recon.log -timeo
 
 docker run -v $(pwd):/home/rustscan/  -it --rm --name rustscan rustscan/rustscan:latest --top -a /home/rustscan/targets.txt -b 1000
 
-subfinder -d example.com | tee subdomains.txt
+subfinder -all -t 50 -d example.com | tee subdomains.txt
 
 gowitness scan file -f subdomains.txt --threads 100 --write-db
 
@@ -61,9 +61,16 @@ cat masscan-ports.txt | grep -vE '^#' | awk '{print $4, $7}' | sed 's/\/open.*$/
 ```
 
 ```bash
+#scan with naabu
+naabu -l resolved-hosts.txt -pf uniq-comma-ports.txt -Pn -o naabu-scan.txt -verify -timeout 15 -v
+#provides already output as IP:PORT
+```
+
+```bash
 #scan each port with nmap
  while IFS=':' read -r IP port; do nmap -p "$port" -T3 -n -Pn  -sCV "$IP" >> nmap-scan.txt; done < resolved-ports.txt
 ```
+
 
 ## Dirbust
 

@@ -86,7 +86,7 @@ Get-LocalGroup
 
 net localgroup
 
-# get group members of SomeGroup
+# get group members oLof SomeGroup
 Get-LocalGroupMember SomeGroup
 
 net localgroup SomeGroup
