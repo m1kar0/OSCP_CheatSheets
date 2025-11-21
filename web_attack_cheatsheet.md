@@ -40,7 +40,8 @@ nuclei -list urls.txt
 
 #This gives list of ip of resolved domains
 
-dnsx -l subdomains.txt -a -silent -ro | sort -u | while read -r ip; do echo "$ip $(dig +short A $ip 2>/dev/null"; done > resolved-ips.txt
+dnsx -l subdomains.txt -a -resp -silent | sort -u > resolved-ips.txt
+
 ```
 
 ```bash
@@ -921,3 +922,17 @@ Possible injection methods:
 
 2. Find the sink (js function or DOM element) that can be accessed by the source.
 3. Gadget exploit: a property passed into sink that can be executed.
+
+## Cloud
+
+### S3 Bucket
+
+```python
+
+from boto.s3.connection import S3Connection
+conn = S3Connection('access-key','secret-access-key')
+bucket = conn.get_bucket('bucket')
+for key in bucket.list():
+    print(key.name.encode('utf-8'))
+
+```
