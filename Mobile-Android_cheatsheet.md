@@ -164,9 +164,21 @@ first remove the original app
 
 `adb uninstall com.android.insecurebankv2`
 
+Change the code within the package.
+
+Delete not needed stuff:
+
+```
+rm CERT.RSA
+rm CERT.SF
+rm MANIFEST.MF
+```
+
+Create new apk: `zip -r new.patch.apk *`
+
 then sign using the uber signing tool while in the directory with the needed apks 
 
-`uber-apk-signer --apks ./`
+`java -jar uber-apk-signer --apks ./`
 
 
 ## Using objection
