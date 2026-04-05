@@ -1,8 +1,22 @@
-# Pentesting Android - Mobile
+## HTTP Proxy
 
-## Methodology
+It is essential to be able to read the traffic in Burp or any other tool between Android app and the backend. If there is no SLL-pinning protection within the app, then it is possible with those steps:
 
+1. Generate in Burp a certificate: `cacert.der`
+2. Convert it to `pem`: `openssl x509 -inform DER -in cacert.der -out cacert.pem`
+3. Transfer to the emulated devices: `adb push cacert.pem /sdcard`
+4. Install cert:
+```
+Settings > Security > Encryption & credentials > Install a certificate > CA certificate
+```
 
+5. Check:
+
+```
+Settings > Security > Encryption & credentials > Trusted credentials > User > [PortSwiggerCA] 
+```
+
+6. Set device proxy to Burp: `ip:port` (look up on host) in `Settings -> Network -> Wifi -> advanced -> proxy`. 
 
 ## ADB use
 
@@ -64,6 +78,8 @@ $ adb shell id
 #you need to see this
 uid=0(root) gid=0(root) groups=0(root)
 ```
+
+
 
 ## FRIDA
 

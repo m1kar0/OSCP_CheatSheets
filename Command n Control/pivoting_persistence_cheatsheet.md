@@ -60,11 +60,12 @@ some service is listening at victim and connection is incomming from atacker
 
 ### static  forwardin
 
-
+```
  <local-interface>:<local-port>:<remote-host>:<remote-port>
 
 which does  port forwarding, sharing server's `<remote-host>:<remote-port>` on clients `<local-interface>:<local-port>`
- 
+```
+
 * workflow
 
 Set up new server (this time non socks) on attacker
@@ -122,6 +123,21 @@ proxychains nmap -F 10.185.10.0/24
 `ssh -N -L 0.0.0.0:4455:10.16.223.217:445 root@192.168.11.2`
 
 Attacker can access remote victim port 445 locally on port 4455.
+
+
+Example forward local port to remote:
+
+```bash
+ssh -p 1122 \                                                        
+  -L 7171:127.0.0.1:7171 \
+  -o ServerAliveInterval=60 \
+  -o ServerAliveCountMax=3 \
+  -o ExitOnForwardFailure=yes \
+  -f -q -N \
+  user@remote
+```
+
+
 
 #### SSH Remote Port forwarding
 

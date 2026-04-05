@@ -22,11 +22,20 @@ amass enum -active -d $domain -brute -w $sub_domains -o $domain.recon.log -timeo
 
 ```bash
 
-docker run -v $(pwd):/home/rustscan/  -it --rm --name rustscan rustscan/rustscan:latest --top -a /home/rustscan/targets.txt -b 1000
+sudo masscan $(cat ip_ranges_ASN.txt) \
+    --top-ports 1000 \
+    --rate 10000 \
+    --open \
+    --randomize-hosts \
+    -oX scan.xml
+
+xmlstarlet sel -t -m "//host" -v "address/@addr" -o ":" -m "ports/port[state/@state='open']" -v "@portid" -n scan.xml > open_ports.txt
 
 subfinder -all -t 50 -d example.com | tee subdomains.txt
 
-gowitness scan file -f subdomains.txt --threads 100 --write-db
+cat open_ports.txt > recon.txt && cat subdomains.txt >> recon.txt
+
+gowitness scan file -f recon.txt --threads 100 --write-db
 
 gowitness report server 127.0.0.1:7171
 

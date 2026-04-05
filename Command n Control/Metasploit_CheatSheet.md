@@ -37,10 +37,6 @@ List of modules:
 * sessions [session_id]: interact with a specific session
 * background sessions: CTRL+Z
 
-## meterpreter commands
-
-* initiate meterpreter session an type `help`
-* my favorites: hashdump, getsystem, shell, 
 
 ## Example
 
@@ -56,57 +52,9 @@ run
 enjoy
 
 ```
-# using the Database
 
-To interract with multiple targets efficiently it is a good practice to use MSF Database.
 
-1. `systemctl start postgresql`
-2. `msfdb init`
-3. DB should be created and active now. Check it:
-```
-#restart
-msfconsole
-
-db_status
-[*] Connected to msf. Connection type: postgresql.
-```
-
-4. Add workspace to isolate projects
-```
-workspace
-* default
-
-workspace -a foospace
-[*] Added workspace: foospace
-[*] Workspace: foospace
-```
-5. Navigate: `workspace foospace`
-6. other actions on workspace
-```
-msf6 > workspace -h
-Usage:
-    workspace                  List workspaces
-    workspace -v               List workspaces verbosely
-    workspace [name]           Switch workspace
-    workspace -a [name] ...    Add workspace(s)
-    workspace -d [name] ...    Delete workspace(s)
-    workspace -D               Delete all workspaces
-    workspace -r <old> <new>   Rename workspace
-    workspace -h               Show this help information
-```
-7. Run scan and save automatically to database:
-
-```
-db_nmap -sV -p- 10.10.xxx.xxx
-
-# search for artefacts thereafter
-hosts
-services
-```
-
-# Shells
-
-## Multi Handler
+## Multi Handler for Shells
 
 This payload is used to provide a universal listener to multiple reverse shells.
 
