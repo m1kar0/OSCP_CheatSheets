@@ -1,22 +1,19 @@
-# AV bypass cheatsheet
 
-Sometime it is needed to use some binary but it gets blocke by AV. What to do? Just by pass it..
 
-AV uses static and dynamic methods to detect malware, but we are not malware. So lets think about this.
+## Recon
 
-Test on `antiscan.me`
+Try checking for AV if you got RCE:
 
-## Basics
+```powershell
+PS C:\> wmic /namespace:\\root\securitycenter2 path antivirusproduct
+PS C:\> Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct
+PS C:\> Get-Service WinDefend
+PS C:\> Get-NetFirewalLProfile
+PS C:\> Get-EventLog -List
+PS C:\> wmic product get name,version
+```
 
-* dump binary 
-
-`xxd -b file.txt`
-
-* dump strings 
-
-`strings file.txt`
-
-### High level list of methods
+### High level bypass methods
 
 * packers
 * obfuscators (incl. run in memory)
