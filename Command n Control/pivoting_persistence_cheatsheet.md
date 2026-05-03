@@ -98,15 +98,12 @@ would be othervise not visible for his network adapter
 
 `./chisel server -p 3333 --reverse --socks5`
 
-* on server
-
-
 ```bash
 sudo vim /etc/proxychains4.conf
 
 # socks5 127.0.0.1 1080
 
-./chisel client 172.16.40.5:3333 R:1080:socks
+chisel.exe client 172.16.40.5:3333 R:1080:socks
 
 # test
 

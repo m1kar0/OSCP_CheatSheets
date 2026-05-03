@@ -1,16 +1,106 @@
-# AD Cheat Sheet
+## Theory
 
-Very nice cheatsheet which goes beyond OSCP can be found here too: https://github.com/S1ckB0y1337/Active-Directory-Exploitation-Cheat-Sheet
+### AD Structure
 
-Use Exogol, it contains all the up to date tools mentioned in this papers: https://github.com/ThePorgs/Exegol
+* Domain Controller (DC) is a Windows Server containing Active Directory Domain Services (AD DS)
+* AD DS data store: **NTDS.dit** - a database that contains all of the information of an Active Directory domain controller as well as password hashes for domain users.
+* **NTDS.dit** is stored by default in %SystemRoot%\NTDS  
 
-## Essentials
+```powershell
+# Or find ntds.dit using Powershell
+Get-ChildItem -Path c:\ -Include ntds.dit -Recurse
+```
 
-note: use pypykatz for offline emulation of mimikatz commands or for invoking mimikatz like commands via python on compromised machine. 
+* DC handles authentication and authorization services
+* DC replicate updates from other domain controllers in the forest
+* DC Allows admin access to manage domain resources
 
-https://github.com/skelsec/pypykatz
+### Forest
 
-Avoid using mimikatz without proper obfuscation as it can be detected by most AVs and EDRs.
+* Forest: collection of one or more trees
+* Tree: collection of several domains with hierarchical order
+* Organizational Units (OUs): Containers for groups, computers, users, printers and other OUs
+* Trusts: Allows users to access resources in other domains
+* Objects: users, groups, printers, computers, shares
+* Domain Services: DNS Server, LLMNR, IPv6, MSSQL etc.
+* Domain Schema: Rules for object creation
+
+Example structre would have top domain like **main.com** and under it may be further domains **sub.main.com** and **external.main.com**. Thos three domain represnet a tree. OUs in main can access sub and external but not in reverse.
+
+### Users
+
+Users are core of AD and DC's task is to manage access of those users to services.
+
+* Domain Admins (DA): have ultimate control over the domain. They can access to the domain controller. If DA is compromised then NTDS.dit can be dumped using dsync attack.
+* Service Accounts (can be also have Domain Admin rights): required by Windows for services such as SQL to pair a service with a service account. Some of them are associated with user accounts and have human-made passwords what makes them vulnerable to Kerberoasting attacks. 
+* Local Administrators: local machine administrators. Compromis of local admin can lead to ticket and credentials grabbing from local machine to impersonate other users and services in AD.
+* Domain Users: normal users. They can log into machines where they are authorized to. Users may be part of interesting groups that allows lateral movement once the user account is compromised.
+
+### Groups
+
+* Security Groups: permissions users and services. Some groups have rights to change DACLs.
+* Distribution Groups: email distribution lists. As an attacker these groups are less beneficial to us but can still be beneficial in enumeration
+
+### Kerberos Time Sync
+
+To be able to use Kerberos Authentication it is necessary to sync clock with AD domain controller
+
+```bash
+
+
+ntpdate $TARGET_IP $DC_IP
+CLOCK: time stepped by 25199.442889
+```
+
+### Kerberos Authentication Flow
+
+```
+Phase 1: AS Exchange
+--------------------
+C → AS:   IDc, IDtgs
+AS → C:   E(Kc, Kc,tgs)  +  TGT = E(Ktgs, {..., Kc,tgs})
+
+
+Phase 2: TGS Exchange
+---------------------
+C → TGS:  TGT + E(Kc,tgs, Authenticator) + IDs
+TGS → C:  E(Kc,tgs, Kc,s) + Ticket_s = E(Ks, {..., Kc,s})
+
+
+Phase 3: AP Exchange
+--------------------
+C → S:    Ticket_s + E(Kc,s, Authenticator)
+S → C:    E(Kc,s, Timestamp+1)   (optional)
+```
+
+TBD
+
+## Recon
+
+Once network access is obtained, it is time for gathering information for further attacks.
+
+### With Creds/ Local Foothold
+
+Let's assume that at this point you have credentials or a foothold within a compromised machine
+
+#### net.exe
+
+'net.exe' system utility is widely available and can be used once foothold on windows host within domain is obtained.
+
+* `net user`
+* `net user /domain` 
+* `net user some_admin /domain`
+* `net group /domain`
+* `net accounts`
+
+### Domain Controller Discovery
+
+
+
+* **Troubleshooting**: `nltest /dsgetdc:domain.local`
+* **DNS query**: `nslookup -q=srv _ldap._tcp.dc._msdcs.domain.local`
+* **Using nltest**: `nltest /dclist:domain.local`
+
 
 ```powershell
 
@@ -64,130 +154,15 @@ Creates a Golden Ticket for persistent domain-wide access using the krbtgt hash.
 
 ```
 
+note: use pypykatz for offline emulation of mimikatz commands or for invoking mimikatz like commands via python on compromised machine. 
 
-## Theory
+https://github.com/skelsec/pypykatz
 
-### AD Structure
-
-* Domain Controller (DC) is a Windows Server containing Active Directory Domain Services (AD DS)
-* AD DS data store: **NTDS.dit** - a database that contains all of the information of an Active Directory domain controller as well as password hashes for domain users.
-* **NTDS.dit** is stored by default in %SystemRoot%\NTDS  
-
-```powershell
-# Or find ntds.dit using Powershell
-Get-ChildItem -Path c:\ -Include ntds.dit -Recurse
-```
-
-* DC handles authentication and authorization services
-* DC replicate updates from other domain controllers in the forest
-* DC Allows admin access to manage domain resources
-
-### Forest
-
-* Forest: collection of one or more trees
-* Tree: collection of several domains with hierarchical order
-* Organizational Units (OUs): Containers for groups, computers, users, printers and other OUs
-* Trusts: Allows users to access resources in other domains
-* Objects: users, groups, printers, computers, shares
-* Domain Services: DNS Server, LLMNR, IPv6, MSSQL etc.
-* Domain Schema: Rules for object creation
-
-Example structre would have top domain like **main.com** and under it may be further domains **sub.main.com** and **external.main.com**. Thos three domain represnet a tree. OUs in main can access sub and external but not in reverse.
-
-### Users
-
-Users are core of AD and DC's task is to manage access of those users to services.
-
-* Domain Admins (DA): have ultimate control over the domain. They can access to the domain controller. If DA is compromised then NTDS.dit can be dumped using dsync attack.
-* Service Accounts (can be also have Domain Admin rights): required by Windows for services such as SQL to pair a service with a service account. Some of them are associated with user accounts and have human-made passwords what makes them vulnerable to Kerberoasting attacks. 
-* Local Administrators: local machine administrators. Compromis of local admin can lead to ticket and credentials grabbing from local machine to impersonate other users and services in AD.
-* Domain Users: normal users. They can log into machines where they are authorized to. Users may be part of interesting groups that allows lateral movement once the user account is compromised.
-
-### Groups
-
-* Security Groups: permissions users and services. Some groups have rights to change DACLs.
-* Distribution Groups: email distribution lists. As an attacker these groups are less beneficial to us but can still be beneficial in enumeration
-
-### Time Sync
-
-* manual way
-
-```bash
+### Without Creds
 
 
-nmap -sT $DC_IP -p445 --script smb2-time -vv
-
-Host script results:
-| smb2-time: 
-|   date: 2024-10-11T22:58:45
-|_  start_date: N/A
 
 
-faketime '2022-10-11 22:58:45' bash
-
-```
-
-
-* to be able to use Kerberos Authentication it is necessary to sync clock with AD domain controller
-
-```bash
-#check time
-
-tzutil /g
-
-time
-
-sudo apt-get install ntp
-
-vi /etc/ntp.conf
-
-server 0.dc01.corp.local
-
-
-/etc/init.d/ntpd restart
-
-# or
-
-/usr/sbin/ntpdate pool.ntp.org
-
-
-```
-
-### Kerberos authentication setup
-
-It is possible to setup local Kerberos authentication for linux if credentials and access to target networks are given.
-
-```bash
-kinit logtin@corp.com -V
-sudo cat /etc/krb5.conf
-klist
-```
-
-Also possible to associate workstation using `realm`
-
-https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/integrating_rhel_systems_directly_with_windows_active_directory/connecting-rhel-systems-directly-to-ad-using-sssd_integrating-rhel-systems-directly-with-active-directory
-
-## Active Directory Enumeration
-
-### net.exe
-
-'net.exe' system utility is widely available and can be used once foothold on windows host within domain is obtained.
-
-* `net user`
-* `net user /domain` returns a list of users in domain
-* `net user some_admin /domain` info about some_admin domain account
-* `net group /domain`
-* `net accounts` lookup AD password policy
-
-Always make sure that you check if some account is a domain account or local. If account is a domain accoutn use it for further domain enumeration!
-
-#### Domain Controller Discovery
-For more details see: https://docs.microsoft.com/en-us/troubleshoot/windows-server/identity/how-domain-controllers-are-located
-
-
-* **Troubleshooting**: `nltest /dsgetdc:domain.local`
-* **DNS query**: `nslookup -q=srv _ldap._tcp.dc._msdcs.domain.local`
-* **Using nltest**: `nltest /dclist:domain.local`
 
 
 ### powershell methods
@@ -1117,3 +1092,4 @@ or smbexec if ADMIN is given
 * Attack Methods Summary: [m0chan](https://m0chan.github.io/2019/07/31/How-To-Attack-Kerberos-101.html)
 * HackTricks: https://book.hacktricks.xyz/windows-hardening/active-directory-methodology
 * Relay Attacks: https://w4h33d.gitbook.io/hack-notes/active-directory-ad/active-directory-attacks/ipv6-attacks/ipv6-attack-in-action
+* Another very nice cheatsheet which goes beyond OSCP can be found here too: https://github.com/S1ckB0y1337/Active-Directory-Exploitation-Cheat-Sheet

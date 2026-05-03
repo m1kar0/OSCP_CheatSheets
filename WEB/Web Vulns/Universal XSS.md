@@ -1,0 +1,1 @@
+XSS that occurs due to CVE in a browser

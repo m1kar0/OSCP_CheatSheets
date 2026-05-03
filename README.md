@@ -4,7 +4,16 @@ I have started gathering all my pentest know how within a guid during my path to
 
 This Repository is a continuous work in progress so stay tuned!
 
-## How to use
+## How to read
+
+Each topic has a `CheatSheet` in it which can be seen a highly condensed information that is contained in single subsections. So my advice is to start with cheat sheet to get Quick Wins and then dig deeper into the topics if needed.
+
+All topics within `misc` are highly useful but are work in Progress and haven't got a separate category yet.
+## How to install
+
+```bash
+git clone git@github.com:m1kar0/OSCP_CheatSheets.git
+```
 
 All Cheat Sheets can be viewed as markdown files. It is, however, easier to view everything with Obsidian.
 

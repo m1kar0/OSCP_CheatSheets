@@ -142,6 +142,64 @@ frida -U --runtime=v8 -l hook.js -f app.process.test
 
 ```
 
+#### Frida Scripts 
+
+How to run a script
+
+```bash
+
+frida -U -f com.example.apkrypt -l hook_decrypt.js
+
+```
+
+* Scripts for everything: https://github.com/0xdea/frida-scripts
+* Other source: https://codeshare.frida.re/
+
+Own template:
+
+```js
+
+//initiate hook
+Java.perform( function(){
+
+//function to hook
+var MainAct = Java.use("com.example.apkrypt.MainActivity");
+
+
+if (MainAct){
+//check if hooked
+console.log("Main exists 123");
+
+}
+
+  
+//change return value
+MainAct.md5.implementation = function (str) {
+
+console.log("I got " + str);
+
+return "735c3628699822c4c1c09219f317a8e9";
+
+}
+
+  
+//change return value for other function and log
+MainAct.decrypt.implementation = function (str){
+
+console.log("Cyphertext = " + str);
+
+var result = this.decrypt(str);
+
+console.log("Flag " + result);
+
+return result;
+
+}
+
+});
+
+```
+
 ### Objection SETUP
 
 

