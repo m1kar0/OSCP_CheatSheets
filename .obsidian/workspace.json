@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Windows/Windows_PrivEsc_cheatsheet.md",
+                "file": "Active Directory/Trust Attacks/Intra Forest Attacks/GPO Onsite Attack.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Windows_PrivEsc_cheatsheet"
+              "title": "GPO Onsite Attack"
             }
           }
         ]
@@ -53,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "chisel",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -185,17 +185,20 @@
   },
   "active": "79656d66364a0190",
   "lastOpenFiles": [
+    "Active Directory/Trust Attacks/Enumeration.md",
+    "Active Directory/Trust Attacks/Intra Forest Attacks/GPO Onsite Attack.md",
     "Command n Control/pivoting_persistence_cheatsheet.md",
-    "Active Directory/Trust Attacks/NC Replication - ADCS Abuse.md",
-    "Active Directory/Trust Attacks/Unconstrained delegation - Chile to Parent DC.md",
-    "Active Directory/Trust Attacks/_Theory.md",
+    "Active Directory/Trust Attacks/Intra Forest Attacks",
+    "Windows/Windows_PrivEsc_cheatsheet.md",
     "Active Directory/AD cheatsheet.md",
+    "Active Directory/Trust Attacks/Intra Forest Attacks/NC Replication - ADCS Abuse.md",
+    "Active Directory/Trust Attacks/Intra Forest Attacks/Unconstrained delegation - Chile to Parent DC.md",
+    "Active Directory/Trust Attacks/_Theory.md",
     "Windows/How to Install Rubeus and other .NET4.0 stuff.md",
     "Active Directory/Trust Attacks/Attacks.md",
     "Active Directory/Relay Attacks/NTLM Relay/DHCP Poisoning.md",
     "Авторское послесловиеСпасибо тем, кто дочитал до конца! Для меня очень важно разбирать чужие репорты, ведь можно многому научиться. До новых встреч!.md",
     "Active Directory/Relay Attacks/mitm6 relay/Kerberos to ESC-8 relay.md",
-    "Active Directory/Trust Attacks/Enumeration.md",
     "Active Directory/Relay Attacks/mitm6 relay",
     "Active Directory/Relay Attacks/Untitled.md",
     "WEB/Web Cheatsheet.md",
@@ -206,7 +209,6 @@
     "misc/mail_cheatsheet.md",
     "Active Directory/Relay Attacks/NTLM Relay/NTLM Relay.md",
     "Active Directory/Relay Attacks",
-    "Windows/Windows_PrivEsc_cheatsheet.md",
     "Windows/Custom_Shell_Code_Runner.md",
     "Windows/AV_bypass.md",
     "Phishing/HTML_Smuggling.md",
@@ -217,11 +219,9 @@
     "WEB/Web Vulns",
     "WEB/Web Checklist.md",
     "Android/Android Сheatsheet.md",
-    "02 - Web - Checklist.md",
     "WEB/Web Scripts",
     "misc",
     "iOS",
-    "Windows",
     "Untitled.canvas"
   ]
 }
