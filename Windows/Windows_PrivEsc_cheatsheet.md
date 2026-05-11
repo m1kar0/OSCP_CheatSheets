@@ -1,3 +1,6 @@
+
+* Place to get VS from: https://gist.github.com/Chenx221/6f4ed72cd785d80edb0bc50c9921daf7
+
 # Basics
 
 ## Enum
