@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Active Directory/Trust Attacks/Intra Forest Attacks/Golden GMSA Attack.md",
+                "file": "Persistence/Metasploit_CheatSheet.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Golden GMSA Attack"
+              "title": "Metasploit_CheatSheet"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "README.md",
+                "file": "Persistence/Metasploit_CheatSheet.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for README"
+              "title": "Backlinks for Metasploit_CheatSheet"
             }
           },
           {
@@ -183,45 +183,46 @@
       "bases:Create new base": false
     }
   },
-  "active": "79656d66364a0190",
+  "active": "6edce8590f6556e1",
   "lastOpenFiles": [
-    "Active Directory/Trust Attacks/Cross Forest Attacks/Golden dMSA.md",
-    "Command n Control/pivoting_persistence_cheatsheet.md",
-    "Active Directory/Trust Attacks/Intra Forest Attacks/Golden GMSA Attack.md",
-    "Windows/Windows_PrivEsc_cheatsheet.md",
-    "Active Directory/Trust Attacks/_ Active Directory Trusts Attacks Theory.md",
-    "Active Directory/Trust Attacks/_ Enumeration of AD Trusts.md",
-    "Active Directory/Trust Attacks/Cross Forest Attacks",
-    "Active Directory/Trust Attacks/Intra Forest Attacks/Unconstrained delegation - Chile to Parent DC.md",
-    "Active Directory/Trust Attacks/Intra Forest Attacks/GPO Onsite Attack.md",
-    "Active Directory/Trust Attacks/Intra Forest Attacks",
-    "Active Directory/AD cheatsheet.md",
-    "Active Directory/Trust Attacks/Intra Forest Attacks/NC Replication - ADCS Abuse.md",
-    "Windows/How to Install Rubeus and other .NET4.0 stuff.md",
-    "Active Directory/Trust Attacks/Attacks.md",
-    "Active Directory/Relay Attacks/NTLM Relay/DHCP Poisoning.md",
-    "Авторское послесловиеСпасибо тем, кто дочитал до конца! Для меня очень важно разбирать чужие репорты, ведь можно многому научиться. До новых встреч!.md",
-    "Active Directory/Relay Attacks/mitm6 relay/Kerberos to ESC-8 relay.md",
-    "Active Directory/Relay Attacks/mitm6 relay",
-    "Active Directory/Relay Attacks/Untitled.md",
-    "WEB/Web Cheatsheet.md",
-    "Active Directory/Relay Attacks/NTLM Relay",
+    "Persistence/pivoting_persistence_cheatsheet.md",
+    "WEB/wordpress_cheatsheet.md",
     "misc/wifi_cheatsheet.md",
-    "README.md",
-    "Active Directory/Trust Attacks",
+    "misc/social_engineering.md",
+    "Persistence/SNMP_cheatsheet.md",
+    "misc/screen_cheatsheet.md",
+    "misc/SMB_cheatsheet.md",
+    "misc/phishing_cheatsheet.md",
+    "misc/reverse_engineering.md",
+    "WEB/php_cheatsheet.md",
+    "WEB/network_recon.md",
+    "WEB/mongodb_cheatsheet.md",
     "misc/mail_cheatsheet.md",
-    "Active Directory/Relay Attacks/NTLM Relay/NTLM Relay.md",
+    "K8s/K8s_cheatsheet.md",
+    "misc/Keepass_cheatsheet.md",
+    "misc/hw_hacking.md",
+    "misc/jenkins_cheatsheet.md",
+    "misc/hashcracking_cheatsheet.md",
+    "WEB/graphql-cheatsheet.md",
+    "misc/DNS_cheatsheet.md",
+    "misc/docker_cheatsheet.md",
+    "misc/bash_cheatsheet.md",
+    "WEB/API_cheatsheet.md",
+    "misc/js_cheatsheet.md",
+    "misc/misc.md",
+    "Persistence/powershellEmpire_cheatsheet.md",
+    "Persistence",
+    "img/Pasted image 20260512100827.png",
+    "img",
+    "Active Directory/Relay Attacks/Coercion Methods.png",
+    "Active Directory/Trust Attacks/Cross Forest Attacks",
+    "Active Directory/Trust Attacks/Intra Forest Attacks",
+    "Active Directory/Relay Attacks/mitm6 relay",
+    "Active Directory/Relay Attacks/NTLM Relay",
+    "Active Directory/Trust Attacks",
     "Active Directory/Relay Attacks",
-    "Windows/Custom_Shell_Code_Runner.md",
-    "Windows/AV_bypass.md",
-    "Phishing/HTML_Smuggling.md",
     "Phishing",
-    "coercion_mthods.png",
-    "WEB/Web Vulns/Universal XSS.md",
-    "WEB/Web Scripts/CSRF templates.md",
     "WEB/Web Vulns",
-    "WEB/Web Scripts",
-    "misc",
     "Untitled.canvas"
   ]
 }
