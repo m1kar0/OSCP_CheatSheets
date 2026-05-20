@@ -17,6 +17,10 @@ The script there is obfuscated but additional levels of obfuscation are welcome.
 
 ### Basic System enumeration
 
+**Important notes**:
+
+- The local Administrators group name may vary by OS language (e.g., _Administrateurs_, _Administratoren_, Администраторы).
+
 ```powershell
 # 1. user
 Get-ExecutionPolicy -Scope CurrentUser
