@@ -4,7 +4,7 @@ I have started gathering all my pentest Know-How within a guide during my learni
 
 Now after some years as a full time pentester I have finally decided to enrich this guide with some helpful real-life tools that may go beyond the scope of OSCP. 
 
-However, while preparing for OSCP you may still find useful those CheatSheets useful.
+However, while preparing for OSCP you may still find those CheatSheets useful.
 
 **This Repository is a continuous work in progress so stay tuned!**
 
