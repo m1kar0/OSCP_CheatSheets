@@ -1,5 +1,5 @@
 
-* Place to get VS from: https://gist.github.com/Chenx221/6f4ed72cd785d80edb0bc50c9921daf7
+* nice references: https://wadcoms.github.io/
 
 # Basics
 
@@ -112,6 +112,12 @@ Get-Command *defender*
 5. Search interesting files in Desktop, Documents, Downloads
 6. Check processes
 7. Network connections
+
+
+
+**Important Considerations**
+
+- **Conflict with System (PID 4):** `net stop lanmanserver`
 ### ACL for folders and files
 
 I use cmd `icacls` for ACLs because it is more straightforward than powershell `Get-ACL`.
@@ -1190,7 +1196,7 @@ C:\Windows\System32\cmd.exe /k %windir%\System32\reg.exe ADD HKLM\SOFTWARE\Micro
 # TURN OFF ANTIVIRUS (can be detected by EDRs!!! so use with caution!!!)
 run killav
 
-# enable RDP
+# enable netRDP
 reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
 
 # add user

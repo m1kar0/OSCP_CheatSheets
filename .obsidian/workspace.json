@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Persistence/Metasploit_CheatSheet.md",
+                "file": "Active Directory/Dumping Creds/LSASS dump.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Metasploit_CheatSheet"
+              "title": "LSASS dump"
             }
           }
         ]
@@ -53,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "chisel",
+                "query": "RDP",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Persistence/Metasploit_CheatSheet.md",
+                "file": "Active Directory/Relay Attacks/_Intro to Relay Attacks.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for Metasploit_CheatSheet"
+              "title": "Backlinks for _Intro to Relay Attacks"
             }
           },
           {
@@ -183,9 +183,20 @@
       "bases:Create new base": false
     }
   },
-  "active": "6edce8590f6556e1",
+  "active": "79656d66364a0190",
   "lastOpenFiles": [
+    "Windows/Windows_PrivEsc_cheatsheet.md",
+    "Active Directory/Dumping Creds/LSASS dump.md",
+    "Active Directory/Dumping Creds",
+    "Active Directory/AD cheatsheet.md",
+    "Active Directory/Relay Attacks/_Intro to Relay Attacks.md",
     "Persistence/pivoting_persistence_cheatsheet.md",
+    "Active Directory/WSUS Attacks/WSUS HTTP exploit.md",
+    "Active Directory/WSUS Attacks",
+    "Active Directory/Relay Attacks/mitm6 relay/Kerberos to ESC-8 relay.md",
+    "Active Directory/Relay Attacks/NTLM Relay/DHCP Poisoning.md",
+    "Active Directory/Relay Attacks/NTLM Relay/NTLM Relay.md",
+    "Persistence/Metasploit_CheatSheet.md",
     "WEB/wordpress_cheatsheet.md",
     "misc/wifi_cheatsheet.md",
     "misc/social_engineering.md",
@@ -202,15 +213,6 @@
     "misc/Keepass_cheatsheet.md",
     "misc/hw_hacking.md",
     "misc/jenkins_cheatsheet.md",
-    "misc/hashcracking_cheatsheet.md",
-    "WEB/graphql-cheatsheet.md",
-    "misc/DNS_cheatsheet.md",
-    "misc/docker_cheatsheet.md",
-    "misc/bash_cheatsheet.md",
-    "WEB/API_cheatsheet.md",
-    "misc/js_cheatsheet.md",
-    "misc/misc.md",
-    "Persistence/powershellEmpire_cheatsheet.md",
     "Persistence",
     "img/Pasted image 20260512100827.png",
     "img",
@@ -221,8 +223,6 @@
     "Active Directory/Relay Attacks/NTLM Relay",
     "Active Directory/Trust Attacks",
     "Active Directory/Relay Attacks",
-    "Phishing",
-    "WEB/Web Vulns",
     "Untitled.canvas"
   ]
 }
