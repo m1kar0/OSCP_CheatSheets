@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Active Directory/WSUS Attacks/WSUS HTTP exploit.md",
+                "file": "README.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "WSUS HTTP exploit"
+              "title": "README"
             }
           }
         ]
@@ -185,6 +185,7 @@
   },
   "active": "79656d66364a0190",
   "lastOpenFiles": [
+    "Active Directory/WSUS Attacks/WSUS HTTP exploit.md",
     "scripts/frida-scripts/iOS/raptor_frida_ios_trace.js",
     "scripts/frida-scripts/iOS/raptor_frida_ios_enum.js",
     "scripts/frida-scripts/iOS/basic-hook-iOS.js",
@@ -195,7 +196,6 @@
     "scripts/frida-scripts/Android/change_class_var.js",
     "scripts/frida-scripts/iOS",
     "scripts/frida-scripts/Android",
-    "scripts/frida-scripts",
     "misc/wordpress_cheatsheet.md",
     "misc/reverse_engineering.md",
     "misc/privesc_docker_cheatsheet.md",
@@ -220,7 +220,6 @@
     "Android/Android_Frida_Scripts.md",
     "Active Directory/AD_cheatsheet.md",
     "Windows/Windows_PrivEsc_cheatsheet.md",
-    "Active Directory/WSUS Attacks/WSUS HTTP exploit.md",
     "img/Pasted image 20260512100827.png",
     "Active Directory/Relay Attacks/Coercion Methods.png",
     "Untitled.canvas"
