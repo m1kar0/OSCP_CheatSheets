@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Active Directory/WSUS Attacks/WSUS HTTP exploit.md",
+                "file": "Active Directory/Trust Attacks/Intra Forest Attacks/DNS Record Modification.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "WSUS HTTP exploit"
+              "title": "DNS Record Modification"
             }
           }
         ]
@@ -53,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "RDP",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -185,7 +185,13 @@
   },
   "active": "79656d66364a0190",
   "lastOpenFiles": [
+    "Active Directory/Trust Attacks/Intra Forest Attacks/Golden GMSA Attack.md",
+    "Active Directory/Trust Attacks/Intra Forest Attacks/DNS Record Modification.md",
+    "Active Directory/Trust Attacks/Intra Forest Attacks/Unconstrained delegation - Child to Parent DC.md",
     "Windows/Windows_PrivEsc_cheatsheet.md",
+    "Active Directory/Trust Attacks/Intra Forest Attacks/Golden GMSA Attack 1.md",
+    "Active Directory/Relay Attacks/NTLM Relay/DHCP Poisoning.md",
+    "Active Directory/Relay Attacks/NTLM Relay/NTLM Relay.md",
     "Active Directory/WSUS Attacks/WSUS HTTP exploit.md",
     "Active Directory/Dumping Creds/LSASS dump.md",
     "Active Directory/Dumping Creds",
@@ -194,8 +200,6 @@
     "Persistence/pivoting_persistence_cheatsheet.md",
     "Active Directory/WSUS Attacks",
     "Active Directory/Relay Attacks/mitm6 relay/Kerberos to ESC-8 relay.md",
-    "Active Directory/Relay Attacks/NTLM Relay/DHCP Poisoning.md",
-    "Active Directory/Relay Attacks/NTLM Relay/NTLM Relay.md",
     "Persistence/Metasploit_CheatSheet.md",
     "WEB/wordpress_cheatsheet.md",
     "misc/wifi_cheatsheet.md",
@@ -209,10 +213,6 @@
     "WEB/network_recon.md",
     "WEB/mongodb_cheatsheet.md",
     "misc/mail_cheatsheet.md",
-    "K8s/K8s_cheatsheet.md",
-    "misc/Keepass_cheatsheet.md",
-    "misc/hw_hacking.md",
-    "misc/jenkins_cheatsheet.md",
     "Persistence",
     "img/Pasted image 20260512100827.png",
     "img",

