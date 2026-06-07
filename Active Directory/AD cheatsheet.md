@@ -36,10 +36,27 @@ Users are core of AD and DC's task is to manage access of those users to service
 * Local Administrators: local machine administrators. Compromis of local admin can lead to ticket and credentials grabbing from local machine to impersonate other users and services in AD.
 * Domain Users: normal users. They can log into machines where they are authorized to. Users may be part of interesting groups that allows lateral movement once the user account is compromised.
 
+Create new user:
+
+```powershell
+PS C:\Tools> Import-Module .\PowerView.ps1 
+PS C:\Tools> $SecPassword = ConvertTo-SecureString 'veryvery$ecure' -AsPlainText -Force 
+PS C:\Tools> New-DomainUser -Domain domain.local -SamAccountName gooduser -AccountPassword $SecPassword
+```
+
 ### Groups
 
 * Security Groups: permissions users and services. Some groups have rights to change DACLs.
 * Distribution Groups: email distribution lists. As an attacker these groups are less beneficial to us but can still be beneficial in enumeration
+
+Add user to a group:
+
+```powershell
+Add-ADGroupMember -identity "Domain Admins" -Members gooduser -Server domain.local
+
+Get-ADGroupMember  -identity Domain Admins -Server domain.local
+```
+
 
 ### Kerberos Time Sync
 
