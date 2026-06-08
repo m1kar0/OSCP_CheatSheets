@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Active Directory/S4U Attack/S4U Cheatsheet.md",
+                "file": "Active Directory/RBCD Attack/RBCD Attack.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "S4U Cheatsheet"
+              "title": "RBCD Attack"
             }
           }
         ]
@@ -185,8 +185,10 @@
   },
   "active": "79656d66364a0190",
   "lastOpenFiles": [
-    "Active Directory/Trust Attacks/Intra Forest Attacks/ACL abuse.md",
     "Active Directory/S4U Attack/S4U Cheatsheet.md",
+    "Active Directory/RBCD Attack/RBCD Attack.md",
+    "Active Directory/RBCD Attack",
+    "Active Directory/Trust Attacks/Intra Forest Attacks/ACL abuse.md",
     "Active Directory/S4U Attack",
     "Active Directory/ACL Attacks/Reconaissance.md",
     "Active Directory/ACL Attacks/_Intro to ACL Attacks.md",
@@ -214,7 +216,6 @@
     "Persistence/SNMP_cheatsheet.md",
     "misc/screen_cheatsheet.md",
     "misc/SMB_cheatsheet.md",
-    "misc/phishing_cheatsheet.md",
     "Persistence",
     "img/Pasted image 20260512100827.png",
     "img",
@@ -222,7 +223,6 @@
     "Active Directory/Trust Attacks/Cross Forest Attacks",
     "Active Directory/Trust Attacks/Intra Forest Attacks",
     "Active Directory/Relay Attacks/mitm6 relay",
-    "Active Directory/Relay Attacks/NTLM Relay",
     "Untitled.canvas"
   ]
 }
