@@ -1,3 +1,6 @@
+
+### Manual
+
 **Goal**: finding dangerous ACLs.
 
 ```powershell
@@ -20,3 +23,5 @@ Get-DomainObjectAcl -Identity $TARGET -Domain inlanefreight.ad -ResolveGUIDs |
   Sort-Object Identity, ActiveDirectoryRights
 
 ```
+
+### BloodHound

@@ -129,3 +129,9 @@ sudo python3 mitm6/mitm6.py -i eth0 -d domain.local
 **References / Original Research**:
 
 - Dirk-jan Mollema – [Relaying Kerberos over DNS using krbrelayx and mitm6](https://dirkjanm.io/relaying-kerberos-over-dns-with-krbrelayx-and-mitm6/)
+
+### See also
+
+- [NTLM Relay to ADCS](../NTLM%20Relay/NTLM%20Relay%20to%20ADCS.md) - the general (non-Kerberos) NTLM-relay-to-ADCS / ESC8 flow.
+- [DHCP Poisoning](../NTLM%20Relay/DHCP%20Poisoning.md) - the IPv6/mitm6 front-end used here.
+- [NTLM Relay](../NTLM%20Relay/NTLM%20Relay.md) - relay overview and other targets.

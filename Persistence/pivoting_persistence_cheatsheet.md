@@ -157,13 +157,6 @@ ssh -D 8080 -f -C -q -N user@yourserver.com
 
 -N tells SSH not to execute a remote command.
 
-Then make a socks5 entry in proxy chains for .
-
-##### Multi Hop Scenatio
-
-lets assume: localhost -> 10.11.2.3 -> tor
-
-
 ### Using Socat
 
 #### Forward proxy with socat

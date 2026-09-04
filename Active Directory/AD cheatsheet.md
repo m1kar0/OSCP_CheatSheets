@@ -113,9 +113,7 @@ Let's assume that at this point you have credentials or a foothold within a comp
 ### Domain Controller Discovery
 
 
-
-* **Troubleshooting**: `nltest /dsgetdc:domain.local`
-* **DNS query**: `nslookup -q=srv _ldap._tcp.dc._msdcs.domain.local`
+* **DNS query**: `nslookup domain.local`
 * **Using nltest**: `nltest /dclist:domain.local`
 
 
