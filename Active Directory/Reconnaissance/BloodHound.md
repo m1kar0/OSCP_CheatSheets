@@ -1,4 +1,4 @@
-**BloodHound** — after collecting Active Directory data (users, groups, sessions, ACLs) with an ingestor, BloodHound analyzes it and reveals privilege-escalation paths. Collection is covered in [BloodHound Ingestors](BloodHound%20Ingestors.md).
+**BloodHound** — a tool that loads the AD data an ingestor collected into a graph database and then finds the shortest chains of abusable rights leading from an account you control to Domain Admin. It models users, groups, sessions, and ACLs (an ACL is an object's permission list) as nodes and edges, so instead of eyeballing thousands of objects you just ask "who can reach this target" and read the path off a graph. Collection is covered in [BloodHound Ingestors](BloodHound%20Ingestors.md).
 
 ## Getting started
 

@@ -1,4 +1,4 @@
-**Kerberos delegation** lets a service act on behalf of a user against another service (the classic "double hop"). Misconfigured delegation is one of the most reliable escalation-to-Domain-Admin paths in AD. There are four abusable variants; this folder collects them.
+**Kerberos delegation** — a legitimate AD feature that lets a service act on behalf of a user against a second service (the classic "double hop"), so a web app can reach a database as *you* without re-asking for your password. Misconfigure it and you hand attackers one of the most reliable escalation-to-Domain-Admin paths in AD. Four variants are abusable; this folder collects them, each on its own page below.
 
 ## The four types
 

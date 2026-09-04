@@ -1,3 +1,4 @@
+**Golden gMSA Attack** — a gMSA (group Managed Service Account — an account whose password Active Directory generates and rotates on its own) does not store a password; the password is derived from a forest-wide master secret called the KDS root key. If you can read that root key (it takes high privilege, e.g. SYSTEM on a DC), you can compute any gMSA's current or future password yourself, entirely offline and without touching the DC, and because the root key cannot be rotated the access is effectively permanent. Mechanically: you derive the value as K_sid = KDF(root key, gMSA SID, timestamp), turn it into the account's MD4 / NT hash, and feed it to Rubeus `/rc4` to request that gMSA's TGT.
 
 * Tool: https://github.com/Semperis/GoldenGMSA
 * Some nice presentation: https://download.scrt.ch/insomnihack/ins24-slides/Insomnihack%202024%20-%20Burn%20it%20burn%20it%20all.pdf

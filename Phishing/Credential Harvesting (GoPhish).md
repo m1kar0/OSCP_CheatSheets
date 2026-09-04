@@ -1,4 +1,4 @@
-**Credential harvesting (GoPhish)** — the classic approach: a cloned login page on a look-alike domain that simply records whatever the victim types, wrapped in a campaign framework (**GoPhish**) that handles the mailing, tracking, and reporting. Simple and reliable, but it only captures the password - it does **not** beat MFA (use [Evilginx](Evilginx%20%28MFA%20Phishing%20Proxy%29.md) for that).
+**Credential harvesting (GoPhish)** — stand up a copy of a real login page on a look-alike domain and simply record whatever the victim types into it. **GoPhish** is the campaign framework that wraps this end to end: it sends the lure emails, tracks who opens and clicks, hosts the cloned landing page, and reports the results. It is simple and reliable, but it only captures the password — it does **not** beat MFA (multi-factor authentication, the second login step such as a code or app approval); for that, use [Evilginx](Evilginx%20%28MFA%20Phishing%20Proxy%29.md).
 
 ## How it works
 

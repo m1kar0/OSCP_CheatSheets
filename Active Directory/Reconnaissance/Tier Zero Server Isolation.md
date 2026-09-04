@@ -1,4 +1,4 @@
-**Tier Zero server isolation** — internal networks should follow a tiered model where the most sensitive servers (DCs, CAs, backup servers, SCCM, etc.) are not reachable by regular users. Where that segmentation is missing, any remote-access service exposed on a Tier Zero server is a finding ("network segmentation issue").
+**Tier Zero server isolation** — check whether the crown-jewel servers are walled off from ordinary users the way a tiered admin model requires. Tier Zero is the set of systems that effectively control the whole domain (Domain Controllers, Certificate Authorities, backup servers, SCCM), and in a healthy network a normal user segment should not be able to reach their management services at all. Where that segmentation is missing, any remote-access service (SMB, RDP, WinRM, WMI) exposed on a Tier Zero server is a reportable finding ("network segmentation issue") — so you enumerate those servers and port-scan them from a user's vantage point.
 
 ## Discovery
 

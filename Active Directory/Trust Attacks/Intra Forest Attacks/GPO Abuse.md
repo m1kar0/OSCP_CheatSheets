@@ -1,4 +1,4 @@
-**GPO abuse** — if you have edit rights over a Group Policy Object (or the OU it is linked to), you can push a malicious policy (scheduled task, startup script, local-admin membership) to every computer/user in scope for code execution and privilege escalation. General technique; see [GPO Onsite Attack](GPO%20Onsite%20Attack.md) for the trust-path variant.
+**GPO abuse** — a Group Policy Object (GPO — a bundle of settings that Active Directory pushes down to the computers and users it is linked to) is applied automatically and with high privilege on every machine in its scope. If you hold edit rights over a GPO, or over the OU (organizational unit — a container of AD objects) the GPO is linked to, you can drop in a malicious setting — a scheduled task, a startup script, or adding yourself to the local Administrators group — and it runs everywhere in scope, handing you code execution and privilege escalation. This is the general technique; see [GPO Onsite Attack](GPO%20Onsite%20Attack.md) for the trust-path variant.
 
 ## TODO
 

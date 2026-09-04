@@ -1,4 +1,4 @@
-**Read LAPS password** — LAPS stores each machine's rotated local-administrator password in a directory attribute. LAPSv1 keeps it in cleartext (`ms-Mcs-AdmPwd`); Windows LAPS / LAPSv2 keeps it DPAPI-NG-encrypted (`msLAPS-EncryptedPassword`). A principal granted the read right (BloodHound `ReadLAPSPassword` / `AllExtendedRights` on the computer) recovers that host's local-admin password.
+**Read LAPS password** — LAPS (Local Administrator Password Solution) is Microsoft's feature that gives every domain-joined machine a unique local-administrator password and rotates it on a schedule, stashing the current value in a directory attribute on that computer's AD object. LAPSv1 keeps it in cleartext (`ms-Mcs-AdmPwd`); Windows LAPS / LAPSv2 keeps it DPAPI-NG-encrypted (`msLAPS-EncryptedPassword`). If your principal has been granted the read right (BloodHound shows this as `ReadLAPSPassword`, or `AllExtendedRights` on the computer), you read that attribute and walk away with the host's local-admin password — instant local admin on that box.
 
 ## Discovery
 

@@ -1,6 +1,11 @@
-Using SYSTEM on child domain controller it is possible to create a malicious GPO with some task or other payload. This GPO can be then linked as SYSTEM to the replication site, which **spreads it over the whole domain including the parent DC**.
+**GPO Onsite Attack** — with SYSTEM on a child domain controller you build a malicious Group Policy Object (GPO — a bundle of settings AD applies to whatever it is linked to) carrying a payload such as a scheduled task, then link it not to an OU but to an Active Directory *site* (the object that ties policies to a physical location). A site is a **forest-level** object — it lives in the Configuration naming context and is not owned by any single domain — and that is exactly why the cross-domain link works: site and configuration data replicate across the whole forest, so the link reaches the parent DC and the payload runs there with full privilege — which **spreads it over the whole domain including the parent DC**. This bypasses many trust/SID-filtering boundaries because it never relies on cross-domain user tokens — it abuses forest-wide replication and site-level GPO application.
 
-This bypasses many trust/SID-filtering boundaries because it never relies on cross-domain user tokens — it abuses forest-wide replication and site-level GPO application.
+```
+SYSTEM on child DC -> create malicious GPO (scheduled task)
+   -> link GPO to a forest-level Site object (as SYSTEM)
+   -> site/config data replicates forest-wide to parent DC
+   -> parent DC applies the GPO -> payload runs on parent DC
+```
 
 ## Local Workflow
 

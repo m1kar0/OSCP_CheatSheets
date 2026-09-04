@@ -1,4 +1,10 @@
-**Golden Ticket** — forge a Kerberos TGT with the `krbtgt` account's key. Since every TGT is signed/encrypted with `krbtgt`, a forged one lets you impersonate any user (any groups, including Domain/Enterprise Admins) domain-wide, offline, for as long as the `krbtgt` key is unchanged - the strongest domain persistence primitive.
+**Golden Ticket** — forge your own Kerberos TGT (a TGT — the domain's master login ticket that you trade for access to any service) using the secret key of the `krbtgt` account (the special account whose key signs and encrypts every TGT in the domain). Because a DC blindly trusts any TGT that verifies against that one key, a ticket you build offline lets you impersonate any user, in any groups — including Domain and Enterprise Admins — across the whole domain. It keeps working for as long as the `krbtgt` key is unchanged, which makes it the strongest domain persistence primitive.
+
+```
+krbtgt hash/AES + domain SID -> forge TGT offline (no DC)
+present forged TGT -> DC issues service tickets (TGS)
+=> act as any user, any group, no real password
+```
 
 ## Discovery
 

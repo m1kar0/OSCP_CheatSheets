@@ -1,4 +1,4 @@
-**ACL / DACL attacks** — Active Directory objects each carry a security descriptor (DACL) of ACEs granting principals rights over them. When a low-privileged principal holds a dangerous ACE over a user, group, computer, or the domain object, that right can be converted into credentials, group membership, or code execution. These are the edges BloodHound draws in red - the backbone of most AD privilege-escalation paths.
+**ACL / DACL attacks** — every Active Directory object (a user, group, computer, or the domain itself) carries a permission list called a DACL, and that list is made of ACEs — each ACE being one entry that says which principal may do what to the object. When a low-privileged account you control holds a dangerous ACE over some object, you can convert that one permission into real access: a known password, membership in a privileged group, or code execution on a machine. These are the edges BloodHound draws in red - the backbone of most AD privilege-escalation paths, and the pages here show how to cash each one in.
 
 ## The abusable rights
 

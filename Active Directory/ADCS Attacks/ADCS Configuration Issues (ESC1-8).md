@@ -1,4 +1,10 @@
-**AD CS misconfigurations (ESC1-ESC8)** — Windows PKI (Active Directory Certificate Services) is frequently misconfigured. When it is, an attacker often gets a quick path from a low-privileged domain user to full domain compromise. The reference research is SpecterOps' *Certified Pre-Owned*.
+**AD CS misconfigurations (ESC1-ESC8)** — AD CS is Windows' built-in certificate service (its PKI — the system that issues the certificates users and machines log in with). When a template or the CA is set up carelessly, you can ask it for a login certificate that names a privileged account — say a Domain Admin — as its owner, then use that certificate to authenticate as them via PKINIT (Kerberos logon with a certificate instead of a password), taking you from an ordinary domain user to full domain compromise. It works because the KDC (the domain's ticket-issuing server) trusts whatever identity the certificate claims, handing back a TGT (the domain's master login ticket) for that account. Each ESC number (ESC1 through ESC8) is a distinct misconfiguration; the reference research is SpecterOps' *Certified Pre-Owned*.
+
+```
+you (low-priv) -> request a cert naming "Domain Admin" -> CA issues it
+   -> PKINIT with the cert -> KDC returns a TGT as Domain Admin
+   -> you now act as Domain Admin
+```
 
 ## Discovery
 

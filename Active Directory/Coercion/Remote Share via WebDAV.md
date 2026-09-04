@@ -1,4 +1,4 @@
-**Remote share via WebDAV** — stand up a remote share that pretends to be a legitimate one. If the client requires SMB signing, downgrade the connection to WebDAV and carry out the attack anyway, as long as UNC hardening is not applied.
+**Remote share via WebDAV** — serve your own file share that impersonates one the victim's machine trusts, so it connects to you and either authenticates (handing you its login) or loads attacker-controlled files. SMB signing — a tamper-check Windows can require on file-share traffic — would normally block this, but WebDAV, an HTTP-based way to reach the same `\\host\share` (UNC) paths, has no signing, so you downgrade the connection to WebDAV and the attack still works as long as UNC hardening (a Group Policy that forces signing on named paths) is not applied. In practice you stand up a fake network: ISC DHCP hands the target an address, BIND answers every DNS name with your IP, and `wsgidav` serves the files.
 
 ## Exploitation
 

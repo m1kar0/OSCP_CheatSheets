@@ -1,4 +1,4 @@
-**LDAP recon** — extract specific information from Active Directory without dumping everything with BloodHound.
+**LDAP recon** — ask Active Directory targeted questions directly over LDAP (the directory protocol AD speaks) instead of hoovering up the whole domain with BloodHound. Any authenticated user can read most of the directory, so you send a filter (for example, only accounts that have a service name set) and get back just the objects and attributes you asked for — handy when you want one specific answer fast. Do it with `ldapsearch` on Linux, `[ADSISearcher]` on a domain-joined Windows box, or the all-in-one `ldeep`.
 
 ## Method 1: ldapsearch (Linux)
 

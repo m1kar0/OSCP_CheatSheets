@@ -1,4 +1,4 @@
-**QR code phishing (quishing)** — put the phishing link inside a **QR code** instead of a clickable URL. The QR dodges email URL-rewriting/reputation scanners (many don't decode images), and it pushes the victim onto a **personal mobile device** - typically less protected (no EDR, smaller address bar that hides the real domain, work MFA app right there).
+**QR code phishing (quishing)** — put your phishing link inside a **QR code** image instead of a normal clickable URL. Since many email security scanners rewrite and reputation-check text URLs but never decode images, the link hidden in the QR sails past them untouched. It also steers the victim onto their **personal phone** — usually less defended than a work PC (no endpoint monitoring/EDR, a narrow mobile address bar that hides the real domain, and the corporate MFA app conveniently right there) — where they scan it and land on your credential-harvesting or proxy page.
 
 ## How it works
 

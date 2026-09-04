@@ -1,4 +1,4 @@
-**Computer account creation (MachineAccountQuota)** — by default AD lets a user join up to 10 machines to the domain (the `MachineAccountQuota` attribute). Attackers abuse this to create a computer account for NTLM relay / RBCD attacks and get valid domain credentials.
+**Computer account creation (MachineAccountQuota)** — by default Active Directory lets any domain user create up to 10 computer accounts, a limit set by the `MachineAccountQuota` (MAQ) attribute. Creating one hands you a brand-new account whose password you fully control, which is the starting material for attacks like RBCD and NTLM relay to LDAP. Mechanically you add a machine object over LDAP (Impacket's `addcomputer.py` or Powermad's `New-MachineAccount`) and set its password yourself.
 
 **Warning:** Setting `MachineAccountQuota` to `0` is not the only control - the `Add workstations to domain` user-right policy can also prevent creation. A non-zero MAQ does not guarantee users can actually create accounts.
 

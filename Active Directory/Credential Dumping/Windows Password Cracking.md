@@ -1,4 +1,4 @@
-**Windows password cracking** — recover cleartext passwords from the various hash formats collected across AD attacks (NT hashes, Net-NTLM responses, Kerberos tickets, cached domain credentials) with hashcat or john, offline.
+**Windows password cracking** — turn the scrambled password data you collect during AD attacks back into the real, typed passwords. Across these attacks you pick up several formats — NT hashes (the stored form of a Windows password), Net-NTLM responses (challenge-response proofs captured off the wire), Kerberos tickets, and cached domain credentials — and none of them can be reversed directly. Instead you guess: you feed the hash plus a wordlist to `hashcat` or `john`, they scramble each candidate password the same way and compare, and a match reveals the plaintext. It all runs offline on your own machine, so there's no account lockout or noise on the target.
 
 ## Hashcat modes
 

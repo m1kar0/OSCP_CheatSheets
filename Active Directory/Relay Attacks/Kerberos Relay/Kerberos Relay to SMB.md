@@ -1,4 +1,4 @@
-**Kerberos relay to SMB** — relay a coerced Kerberos authentication to another machine's SMB service (when SMB signing is not required) to dump its secrets or run commands. Three flavours: local cross-session (KrbRelay), remote coerced via marshalled DNS (krbrelayx), and remote via a vulnerable DCOM object (RemoteKrbRelay). See [_Intro to Kerberos Relay](_Intro%20to%20Kerberos%20Relay.md) for how the SPN is controlled.
+**Kerberos relay to SMB** — capture a machine's Kerberos login (Windows' ticket-based authentication) and forward it to a different machine's SMB service — the Windows file-sharing protocol — so you act as that account there: dump its secrets or run commands. This only works when the target does not require SMB signing, which would otherwise tamper-proof the session you are hijacking. Three flavours: local cross-session (KrbRelay), remote coerced via marshalled DNS (krbrelayx), and remote via a vulnerable DCOM object (RemoteKrbRelay). See [_Intro to Kerberos Relay](_Intro%20to%20Kerberos%20Relay.md) for how the SPN — the label that ties a ticket to a service — is controlled.
 
 ```mermaid
 sequenceDiagram

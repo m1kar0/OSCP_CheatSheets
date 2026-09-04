@@ -1,4 +1,4 @@
-**Identify Domain Controllers** — locate on-premise DCs once you are connected to an internal network.
+**Identify Domain Controllers** — find the IP of the on-premise Domain Controllers (DCs — the servers that run Active Directory and authenticate every login) once you are on the internal network, since nearly every AD attack is aimed at them. DCs are usually the network's DNS servers, so you start from your own DNS/DHCP settings, then confirm a host really is a DC by checking that Kerberos (TCP 88) answers, and finally query AD's own SRV DNS records (`_kerberos._tcp`, `_ldap._tcp`, ...) which point straight at every DC.
 
 ## 1. Check your network configuration
 

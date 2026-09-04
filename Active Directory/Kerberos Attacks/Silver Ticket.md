@@ -1,4 +1,10 @@
-**Silver Ticket** — forge a Kerberos Service Ticket (TGS) with a **service or computer account's** key. Unlike a [Golden Ticket](../Persistence/Golden%20Ticket.md) it never contacts the DC (no `krbtgt` needed) - the ticket is encrypted with the target service's own key - so it is stealthier but scoped to one service on one host.
+**Silver Ticket** — forge the Kerberos Service Ticket (a TGS — the ticket that proves you may use one specific service) yourself and walk straight into that service, never asking the domain controller. You supply the target **service or computer account's** key (its NT hash or AES key), the domain SID, and the SPN; from those you build a ticket encrypted with the service's own key, so the service trusts it and the DC is never contacted. Unlike a [Golden Ticket](../Persistence/Golden%20Ticket.md) no `krbtgt` key is involved, which makes it quieter — but the ticket is scoped to that one service on that one host.
+
+```
+Normal: client -> KDC (issues TGS) -> service
+Silver: attacker forges TGS with service key (KDC skipped)
+        attacker -> service (AP_REQ) -> access granted
+```
 
 ## Discovery
 

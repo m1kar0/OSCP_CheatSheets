@@ -1,4 +1,4 @@
-**HTML smuggling** — deliver an innocuous `.html` (attached or linked) whose JavaScript assembles the real payload *client-side* from an embedded blob and triggers a download. Because the payload never crosses the wire as a file, it slips past mail gateways and web proxies that scan attachments/downloads.
+**HTML smuggling** — hand the victim a harmless-looking `.html` file (attached or linked) whose JavaScript builds the real payload *inside their own browser* from data baked into the page, then triggers a download of it to disk. Because the payload is assembled client-side and never crosses the wire as a file, mail gateways and web proxies that scan attachments and downloads see only benign HTML and wave it through. Mechanically the JS base64-decodes an embedded blob into a `Blob` and saves it via an anchor `download` + `createObjectURL`; the victim then runs the dropped file.
 
 ## How it works
 

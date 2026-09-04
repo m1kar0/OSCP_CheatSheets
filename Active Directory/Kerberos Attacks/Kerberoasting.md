@@ -1,4 +1,4 @@
-**Kerberoasting** — request a Service Ticket (TGS) for any account that has an SPN set, then crack the encrypted part of the ticket offline to recover the account's cleartext password. Works from any authenticated domain user.
+**Kerberoasting** — turn a service account's password into your hands using nothing more than an ordinary domain login. Any account with an SPN — a label that ties a service to an account — makes the domain hand you a Service Ticket (a TGS) for it, and part of that ticket is encrypted with the account's password hash. You only need valid domain credentials to clear the first Kerberos check. Mechanically: the attack hits the second step of the exchange (TGS_REQ + TGS_REP), and you crack the encrypted portion offline — so target user accounts with an SPN, since machine accounts have 128-character passwords that will not crack.
 
 ## How it works
 

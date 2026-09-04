@@ -1,4 +1,12 @@
-**Unconstrained delegation** — a computer or user account flagged `TRUSTED_FOR_DELEGATION` caches the **TGT of any principal that authenticates to it**. Compromise such a host, coerce a high-value account (ideally a Domain Controller) to authenticate to it, capture the cached TGT, and reuse it - typically to DCSync. This is the general single-domain case; for the child→parent forest escalation see [Unconstrained delegation - Child to Parent DC](../Trust%20Attacks/Intra%20Forest%20Attacks/Unconstrained%20delegation%20-%20Child%20to%20Parent%20DC.md).
+**Unconstrained delegation** — a host with this flag is allowed to stash the login ticket of anyone who connects to it, so if you own that host you can steal a privileged victim's ticket and become them. Any account authenticating to a `TRUSTED_FOR_DELEGATION` machine hands it a full TGT (the domain's master login ticket), which gets cached on the box. Compromise such a host, coerce a high-value account (ideally a Domain Controller) to authenticate to it, capture the cached TGT, and reuse it - typically to DCSync (abuse the DC's replication to pull every account's password hash). This is the general single-domain case; for the child→parent forest escalation see [Unconstrained delegation - Child to Parent DC](../Trust%20Attacks/Intra%20Forest%20Attacks/Unconstrained%20delegation%20-%20Child%20to%20Parent%20DC.md).
+
+```
+you own UD_HOST (Rubeus monitor / krbrelayx)
+you -> DC: coerce auth (printerbug / PetitPotam)
+DC -> UD_HOST: authenticates, sends its TGT
+UD_HOST caches DC TGT -> you extract it
+you -> DC: reuse TGT to DCSync
+```
 
 ## Discovery
 

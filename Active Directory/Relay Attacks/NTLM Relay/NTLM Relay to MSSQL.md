@@ -1,4 +1,11 @@
-**NTLM relay to MSSQL** — if a SQL client authenticates to your machine over MSSQL, standard tools like `ntlmrelayx` cannot relay it directly, because the NTLM authentication is wrapped inside the MSSQL TDS protocol.
+**NTLM relay to MSSQL** — MSSQL is Microsoft's SQL Server database. When a SQL client logs in to your machine, its NTLM authentication is buried inside TDS (Tabular Data Stream, the wire protocol SQL Server speaks), so standard tools like `ntlmrelayx` cannot relay it directly. The fix is a small forwarder that pulls the NTLMSSP messages out of the TDS packets and hands them to `ntlmrelayx` over HTTP, which relays them on to any of the usual targets (LDAP, ADCS, SMB).
+
+```
+SQL client -> attacker: NTLM wrapped inside TDS
+forwarder: extract NTLMSSP from the TDS stream
+forwarder -> ntlmrelayx: NTLMSSP over HTTP
+ntlmrelayx -> target: relay to LDAP / ADCS / SMB
+```
 
 ## Exploitation
 

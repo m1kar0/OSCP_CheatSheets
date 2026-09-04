@@ -1,4 +1,4 @@
-**GPP passwords** — up to Windows Vista / Server 2008, admins could set passwords through Group Policy Preferences (e.g. to deploy a local admin or service account). These are stored as XML in the DC's SYSVOL share, encrypted with AES256 using a **single key that Microsoft published** - so any domain user can decode them and often escalate.
+**GPP passwords** — recover passwords that admins embedded in Group Policy Preferences (GPP), a legacy way to push a local-admin or service account out to every machine. Any domain user can read them because they sit as XML in the DC's SYSVOL share (the domain-wide folder every machine reads policy from), encrypted with AES256 using a **single key that Microsoft published** in its own documentation. So you just grab the `cpassword` value and decrypt it offline with `gpp-decrypt`, often escalating straight away.
 
 ## Discovery
 

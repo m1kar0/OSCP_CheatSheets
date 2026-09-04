@@ -1,4 +1,4 @@
-**Domain password spraying** — two approaches: **USER=PASS** (try the username as the password) and **spraying** (try one common password against many users). Both need a list of valid usernames - see [Domain User Enumeration](Domain%20User%20Enumeration.md). Read the Caution section first.
+**Domain password spraying** — guess your way into a valid domain login while staying under the account-lockout threshold. Instead of hammering one account with many passwords (which locks it), you try a single likely password against a whole list of users (**spraying**), or try each username as its own password (**USER=PASS**) — either way each account sees only one or two attempts. Both need a list of valid usernames first - see [Domain User Enumeration](Domain%20User%20Enumeration.md), and read the Caution section before you start so you do not lock anyone out.
 
 | Tool | Spraying | User=Pass | Reports expired pwd | Shows admin status |
 | --- | :---: | :---: | :---: | :---: |

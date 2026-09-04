@@ -1,6 +1,13 @@
-**Device code phishing** — abuse the legitimate Microsoft/Entra ID **OAuth 2.0 device authorization grant**. You request a device code from Microsoft, send the victim the *real* `microsoft.com/devicelogin` page with your code, and when they sign in (MFA included) to "authorize the device", Microsoft hands **you** the access/refresh tokens. No fake site, no credential capture - the victim authenticates on Microsoft's own domain.
+**Device code phishing** — abuse Microsoft/Entra ID's legitimate **OAuth 2.0 device authorization grant**, the sign-in flow built for gadgets with no keyboard (TVs, consoles) where you type a short code on a second device to log in. You ask Microsoft for a device code, send the victim the *real* `microsoft.com/devicelogin` page along with that code, and when they sign in there — MFA and all — to "authorize the device", Microsoft hands the access/refresh tokens to **you**. There is no fake site and no password to capture: the victim authenticates on Microsoft's own domain, which is exactly what makes the lure convincing.
 
 **Note:** Authorized engagements only. This was heavily abused in the wild in 2025 (Storm-2372 via Teams invite lures).
+
+```
+attacker -> POST /devicecode -> Microsoft (returns user_code)
+attacker -> sends user_code + microsoft.com/devicelogin
+victim -> signs in + MFA at Microsoft -> authorizes
+attacker -> polls /token -> receives access + refresh tokens
+```
 
 ## How it works
 

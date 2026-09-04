@@ -1,4 +1,10 @@
-**ARP cache poisoning** — ARP maps IP addresses (L3) to MAC addresses (L2). Few networks protect against spoofed ARP replies, so it is still an effective way to man-in-the-middle local traffic. Use it when everything else has failed.
+**ARP cache poisoning** — ARP (Address Resolution Protocol) is how a machine on the local network finds the MAC hardware address that sits behind an IP address. Because most networks accept ARP replies without checking them, you send forged replies telling both a victim and the gateway that YOUR MAC belongs to the other party, so their traffic now flows through your machine and you can read or capture it (a man-in-the-middle). Mechanically, ARP maps IP addresses (L3) to MAC addresses (L2), and few networks protect against spoofed ARP replies, so it is still an effective way to man-in-the-middle local traffic. Use it when everything else has failed.
+
+```
+attacker -> victim:  "gateway IP is at my MAC" (forged reply)
+attacker -> gateway: "victim IP is at my MAC"  (forged reply)
+victim <-> attacker <-> gateway  (all traffic relayed)
+```
 
 ## How it works
 

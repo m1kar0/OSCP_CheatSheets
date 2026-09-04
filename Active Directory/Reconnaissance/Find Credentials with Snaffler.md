@@ -1,4 +1,4 @@
-**Snaffler** — crawls SMB shares across a Windows/AD environment to find credentials and other sensitive files ("candy") in the mountain of boring files.
+**Snaffler** — automatically crawls the SMB file shares (Windows network folders) across a domain and surfaces the handful that hold credentials or other secrets. It enumerates reachable computers, lists their shares, and reads files whose name, extension, or contents match built-in rules — passwords, keys, config files, scripts — flagging the hits ("candy") so you do not have to open thousands of boring files by hand. Point it at the whole domain, a single host, or one specific path.
 
 ## Setup
 

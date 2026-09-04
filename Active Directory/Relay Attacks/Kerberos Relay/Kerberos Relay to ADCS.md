@@ -1,4 +1,11 @@
-**Kerberos relay to AD CS (ESC8 over Kerberos)** — relay a coerced Kerberos authentication to the AD CS web-enrollment endpoint (`/certsrv/certfnsh.asp`) to enroll a certificate for the relayed account, then use PKINIT to recover its NT hash / a TGT. Because the HTTP enrollment endpoint usually enforces **no** signing, this is the relay that still works after DCOM hardening (see [_Intro to Kerberos Relay](_Intro%20to%20Kerberos%20Relay.md)).
+**Kerberos relay to AD CS (ESC8 over Kerberos)** — coerce a machine into logging in with Kerberos (Windows' ticket-based authentication), catch that login, and forward it to the AD CS web-enrollment page (the internal website that hands out certificates), so the certificate authority issues you a certificate in the victim's name. That certificate is a credential you now control: PKINIT (certificate-based Kerberos logon) turns it into the account's NT hash or a TGT — its master login ticket. Mechanically: you relay the coerced auth to `/certsrv/certfnsh.asp`, and because that HTTP endpoint usually enforces **no** signing, this is the relay that still works after DCOM hardening (see [_Intro to Kerberos Relay](_Intro%20to%20Kerberos%20Relay.md)).
+
+```
+coerce victim -> Kerberos auth sent to attacker
+attacker relay -> AD CS /certsrv/certfnsh.asp (no signing)
+CA issues a certificate for the victim account
+PKINIT with that cert -> victim NT hash / TGT
+```
 
 ## Discovery
 

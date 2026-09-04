@@ -1,4 +1,10 @@
-**Coercing authentication** — force an arbitrary Windows machine to connect back to you over SMB or HTTP, capturing the NTLM (or Kerberos) authentication of its computer account. Pairs with an [NTLM relay](../Relay%20Attacks/NTLM%20Relay/NTLM%20Relay.md) or with hash cracking.
+**Coercing authentication** — trick any Windows machine into connecting back to a host you control so it hands you the login proof of its computer account — an NTLM authentication, the challenge/response a Windows account sends to prove who it is. You do this by sending the target a remote procedure call (an RPC — a request that runs a function on a remote machine) that names your host inside a file path like `\\ATTACKER_IP\share`, and the machine dutifully authenticates to you over SMB or HTTP — as its **machine account** (`MACHINE$`). Machine-account passwords are 120+ random characters, so that hash is effectively uncrackable: **relaying is realistically the only path** — feed it into an [NTLM relay](../Relay%20Attacks/NTLM%20Relay/NTLM%20Relay.md) and you act as that machine against another server. Cracking only becomes viable through the separate NTLMv1-downgrade trick. The well-known triggers are the Printer Bug, PetitPotam, and ShadowCoerce.
+
+```
+you --RPC: open "\\ATTACKER\share"--> target machine
+target --NTLM auth as MACHINE$--> you (Responder)
+you --relay that auth--> another server  (cracking needs the NTLMv1-downgrade trick)
+```
 
 ## Common techniques
 

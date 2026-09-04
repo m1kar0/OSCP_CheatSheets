@@ -1,4 +1,10 @@
-**Targeted Kerberoasting** — with `GenericAll`/`GenericWrite` over a user account that has no SPN, write a temporary SPN to it, request and crack its service ticket ([Kerberoasting](../Kerberos%20Attacks/Kerberoasting.md)), then remove the SPN. Turns a write-ACE into that user's cleartext password (if crackable).
+**Targeted Kerberoasting** — an SPN (a label that ties a service to an account) makes that account's service ticket requestable by any domain user, and the ticket comes encrypted with the account's password — so a weak password can be cracked offline. When you hold `GenericAll`/`GenericWrite` over a user that has no SPN, you temporarily write a fake SPN to it, request its service ticket ([Kerberoasting](../Kerberos%20Attacks/Kerberoasting.md)), then remove the SPN again. That turns a write-ACE into the user's cleartext password, if it cracks.
+
+```
+add fake SPN to user (no SPN before)
+  -> request TGS (encrypted with user's password)
+  -> crack $krb5tgs$ offline -> remove the fake SPN
+```
 
 ## Discovery
 

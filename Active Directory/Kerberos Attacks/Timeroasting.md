@@ -1,4 +1,10 @@
-**Timeroasting** — abuse the unauthenticated MS-SNTP (authenticated NTP) flow: send a crafted NTP request referencing a computer/trust account's RID and the DC returns a MAC computed from that account's password hash, which is crackable offline. Needs no credentials.
+**Timeroasting** — pull a computer or trust account's password out of the domain controller's clock service, with no credentials at all. Windows DCs answer authenticated-NTP (MS-SNTP) time requests, so if you craft one that names an account by its RID — the numeric tail of the account's SID — the DC replies with a MAC (a keyed checksum) computed from that account's password hash. Mechanically: you feed that MAC to `hashcat -m 31300` and crack it offline; only weak machine or trust passwords fall, but weak ones do turn up.
+
+```
+you -> DC:  MS-SNTP time request naming an account RID
+DC  -> you: reply + MAC keyed by that account's RC4 hash
+you:        crack the MAC offline (hashcat -m 31300)
+```
 
 ## TODO
 

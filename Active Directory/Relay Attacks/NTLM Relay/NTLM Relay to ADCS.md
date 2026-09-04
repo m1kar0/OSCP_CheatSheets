@@ -1,4 +1,12 @@
-**NTLM relay to ADCS (ESC8)** — if a web server accepts NTLM authentication, you can usually relay it, unless Extended Protection for Authentication (EPA) is enforced. A prime target is the enrollment web service of Active Directory Certificate Services. Relaying a Domain Controller's authentication here yields a certificate for the DC and, from there, full domain compromise.
+**NTLM relay to ADCS (ESC8)** — Active Directory Certificate Services (ADCS) is the domain's certificate authority, and it often exposes a web page for requesting certificates (an enrollment endpoint) that accepts NTLM logins. Since a certificate can stand in for a password, you relay a victim's authentication to that page and it issues a certificate in their name; do this with a Domain Controller and you get a certificate for the DC, turn it into the DC's NT hash, and own the domain. You can relay almost any NTLM web auth like this unless Extended Protection for Authentication (EPA) is enforced.
+
+```
+attacker -> DC: coerce NTLM authentication
+DC -> attacker: NTLM over SMB (coerced)
+attacker -> ADCS: relay over HTTP to /certsrv enrollment (cross-protocol SMB->HTTP)
+ADCS -> attacker: certificate for DC$
+attacker: PKINIT with cert -> DC$ NT hash -> domain
+```
 
 **Note:** EPA relies on Channel Binding through TLS, so **cleartext HTTP endpoints are always vulnerable**.
 

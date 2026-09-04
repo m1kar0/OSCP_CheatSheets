@@ -1,4 +1,11 @@
-**NTLM relay** — a weakness in NTLM lets an attacker relay an authentication meant for service A to service B, impersonating the victim on the target service. If the relayed identity has enough privilege on the target, this can lead to code execution. It works whenever you can force a user or computer to authenticate to your machine.
+**NTLM relay** — NTLM is a Windows challenge-response login scheme, and it has no built-in way to confirm who you are really talking to. That lets an attacker take an authentication a victim meant for service A and forward it to service B, logging in as the victim on B without ever learning their password. If that account has enough privilege on B, the relay can reach code execution. It works whenever you can make a user or computer authenticate to your machine.
+
+```
+victim -> attacker: NTLM auth meant for service A
+attacker -> service B: forward the same NTLM auth
+service B -> attacker: welcome, victim
+attacker: act as victim on B (files, commands, LDAP)
+```
 
 Two things to line up for any relay:
 

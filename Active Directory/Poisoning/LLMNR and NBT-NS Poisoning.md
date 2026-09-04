@@ -1,4 +1,4 @@
-**LLMNR / NBT-NS poisoning** — LLMNR and NBT-NS (NetBIOS Name Service) are legacy name-resolution protocols Windows falls back to when DNS fails. An attacker on the local segment answers these broadcast/multicast requests, gets victims to authenticate to them, and captures Net-NTLM hashes.
+**LLMNR / NBT-NS poisoning** — LLMNR and NBT-NS (NetBIOS Name Service) are legacy name-resolution protocols Windows falls back to when DNS has no answer, asking the whole local network "who has this name?". Sitting on the same segment, you answer those broadcast/multicast questions with your own IP, so the victim connects to you and tries to authenticate — and you capture its Net-NTLM hash, a challenge-response proof of the user's password you can crack offline or relay onward. Mechanically, an attacker on the local segment answers these requests, gets victims to authenticate, and captures the Net-NTLM hashes.
 
 ## How it works
 

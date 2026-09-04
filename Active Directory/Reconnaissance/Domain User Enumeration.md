@@ -1,4 +1,4 @@
-**Domain user enumeration** — build a list of valid domain usernames to feed a [password spraying](Domain%20Password%20Spraying.md) or bruteforce attack.
+**Domain user enumeration** — build a clean list of valid domain usernames, the prerequisite for any [password spraying](Domain%20Password%20Spraying.md) or bruteforce attack. You harvest the `sAMAccountName` of every account from data you can already read — an existing BloodHound dump, Impacket's `GetADUsers.py`, or `ldapdomaindump` — then normalise it (lowercase, strip the domain suffix, transliterate accents) so the names feed cleanly into your spraying tool.
 
 ## Method 1: BloodHound + jq
 

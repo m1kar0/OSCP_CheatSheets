@@ -1,4 +1,4 @@
-**LNK payloads** — a Windows shortcut (`.lnk`) whose target runs an arbitrary command. LNKs carry a custom icon (so they can look like a PDF/document), hide their real command line, and are the usual "visible file" inside an [ISO/container](ISO%20and%20Container%20Files.md).
+**LNK payloads** — a Windows shortcut file (`.lnk`) whose hidden target quietly runs any command you choose the moment it is double-clicked. Because a shortcut carries its own custom icon and conceals the real command line behind it, you can dress it up as a harmless PDF or document while it actually launches PowerShell or `rundll32`. It is the usual "visible file" placed inside an [ISO/container](ISO%20and%20Container%20Files.md), pointed at a hidden payload sitting right beside it.
 
 ## How it works
 

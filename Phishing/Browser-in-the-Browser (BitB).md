@@ -1,4 +1,4 @@
-**Browser-in-the-Browser (BitB)** — render a **fake browser popup window** entirely inside your phishing page (HTML/CSS/JS drawing a realistic title bar, address bar, and padlock). It imitates the OAuth/SSO "Sign in with Microsoft/Google" popup, so the victim sees a trustworthy-looking `https://login.microsoftonline.com` URL that is actually just text you painted.
+**Browser-in-the-Browser (BitB)** — draw a **fake browser popup window** — title bar, address bar, padlock and all — entirely inside your phishing page with HTML/CSS/JS, so the victim believes a second, trusted window has opened. It imitates the OAuth/SSO "Sign in with Microsoft/Google" popup (SSO being single sign-on, where one identity provider logs you into many apps), so the victim sees a trustworthy-looking `https://login.microsoftonline.com` URL that is really just text you painted. Mechanically it is only a styled `<div>`: the victim types credentials into your form thinking it is the genuine provider window, while the address bar they trust is non-interactive text, not a real navigation.
 
 ## How it works
 

@@ -1,7 +1,13 @@
-
-**Resource-Based Constrained Delegation (RBCD)** — a form of Kerberos delegation that can be abused to take over a domain-joined machine. Besides [NTLM relay to LDAP](../Relay%20Attacks/NTLM%20Relay/NTLM%20Relay%20to%20LDAP.md) (Attack 3), you can abuse it directly whenever you control an account that can write the `msDS-AllowedToActOnBehalfOfOtherIdentity` attribute of a computer object.
+**Resource-Based Constrained Delegation (RBCD)** — every computer object carries a "who is allowed to impersonate users to me" list, and if you can write that list on a target you add an account you control and then log into the target as any user — typically a local admin — taking the machine over. That list is the `msDS-AllowedToActOnBehalfOfOtherIdentity` attribute; you point it at an account that has an SPN (a service label, usually a throwaway computer account you create), then use S4U2self+S4U2proxy to mint a service ticket impersonating the admin. You can reach this directly whenever you hold write access to that attribute, or via [NTLM relay to LDAP](../Relay%20Attacks/NTLM%20Relay/NTLM%20Relay%20to%20LDAP.md) (Attack 3).
 
 Or in few words: “This resource accepts hops only from these accounts and this can be configured by a user who owns it”.
+
+```
+you -> TARGET object: write AllowedToActOnBehalf = ATTACK$
+you (ATTACK$) -> KDC: S4U2self + S4U2proxy, be Admin
+KDC -> you: service ticket to TARGET as Admin
+you -> TARGET: run commands as Admin
+```
 ## Discovery
 
 Find low-privileged principals with `WriteAccountRestrictions` on a computer (BloodHound cypher):

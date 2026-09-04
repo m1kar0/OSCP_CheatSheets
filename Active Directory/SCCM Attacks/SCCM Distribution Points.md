@@ -1,4 +1,4 @@
-**SCCM Distribution Point looting** — SCCM / MECM distribution-point shares often contain credentials in configuration files, MSI packages, or PowerShell scripts. The Content Library has a complex structure that a normal file browser cannot read, so use dedicated tools.
+**SCCM Distribution Point looting** — a Distribution Point (DP) is the SCCM/MECM server that hands software packages out to machines across the domain, and the files it stores — MSI installers, config files, PowerShell scripts — very often have credentials baked into them. Any account that can read the DP's SMB shares can copy those files and grep them for passwords, handing you fresh domain accounts to move with. Mechanically the DP keeps everything in a "Content Library" whose split DataLib/FileLib layout a normal file browser cannot reassemble, so you point dedicated tools (CMLoot, sccm-http-looter) at it to inventory, download, and extract the packages before searching them.
 
 ## Discovery
 

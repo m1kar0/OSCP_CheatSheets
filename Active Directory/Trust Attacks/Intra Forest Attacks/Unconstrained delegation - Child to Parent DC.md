@@ -1,4 +1,12 @@
-**Unconstrained delegation** — a machine or service account configured with Unconstrained Delegation caches the TGT of *any* user that authenticates to it. Coerce a Domain Controller to authenticate to a host you control that has this flag, capture its TGT, and escalate (typically DCSync). A classic path is a compromised **child DC -> parent DC**.
+**Unconstrained delegation** — a computer or service account flagged for Unconstrained Delegation keeps in memory a reusable copy of the TGT (Ticket Granting Ticket — the master Kerberos ticket that proves who you are and can be exchanged for access to anything) of *any* account that authenticates to it. If you own such a host, you coerce a Domain Controller into authenticating to it, lift the DC's TGT out of memory, and reuse it to act as that DC — typically to DCSync the domain. A classic path is a compromised **child DC -> parent DC**.
+
+```
+you own a host flagged for Unconstrained Delegation
+   -> coerce a target DC to authenticate to your host
+   -> DC hands over its TGT, cached in your host's memory
+   -> capture the TGT (Rubeus / krbrelayx), reuse as the DC
+   -> DCSync the domain
+```
 
 **Note:** Domain Controllers have Unconstrained Delegation by default (it is required for them).
 

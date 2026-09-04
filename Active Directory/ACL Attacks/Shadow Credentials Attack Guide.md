@@ -1,5 +1,10 @@
+**Shadow Credentials** — if you can write to a target account's `msDS-KeyCredentialLink` attribute (the attribute that lists certificates the account is allowed to log in with), you add your own certificate's public key there and then authenticate as that account with PKINIT (the flavor of Kerberos that accepts a certificate instead of a password), earning a TGT — the domain's master login ticket — without ever knowing or resetting its password. Mechanically the write comes from a `GenericAll`/`GenericWrite`/`WriteProperty` ACE on the object; Whisker/pyWhisker inject the key, Rubeus/Certipy perform the PKINIT, and `/getcredentials` also hands you the account's NT hash to replay through S4U2self/S4U2proxy — Kerberos delegation features used to mint service tickets as other users. Because the key stays until you remove it, it survives a password reset and doubles as persistence.
 
-**Powerful AD persistence & lateral movement technique** using `msDS-KeyCredentialLink` attribute.
+```
+write msDS-KeyCredentialLink (your cert public key)
+  -> PKINIT auth as target -> TGT (no password needed)
+  -> /getcredentials -> NT hash -> S4U -> service tickets
+```
 
 ## How Shadow Credentials Work
 

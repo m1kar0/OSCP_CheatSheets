@@ -1,4 +1,10 @@
-**UnPAC-the-hash** — recover an account's NT hash from a certificate/PKINIT. After PKINIT pre-authentication, the KDC returns the account's NTLM hash inside the PAC_CREDENTIAL_INFO of the TGT; a cert (from ADCS, Shadow Credentials, or Golden Certificate) therefore yields the NT hash, not just a TGT.
+**UnPAC-the-hash** — logging in with a certificate normally gets you only a Kerberos ticket, but this technique also squeezes out the account's NT hash — the password-equivalent value reused for NTLM logons. After you pre-authenticate with the certificate via PKINIT (Kerberos' certificate-based logon), the KDC (the domain's ticket-issuing server) hands back the NTLM hash tucked inside the PAC_CREDENTIAL_INFO — a field of the PAC, the part of a Kerberos ticket that carries your identity and credentials — of the returned TGT (the domain's master login ticket). So any certificate you obtain (from ADCS, Shadow Credentials, or a Golden Certificate) yields the reusable NT hash, not just a ticket.
+
+```
+cert -> PKINIT pre-auth -> KDC returns TGT
+   -> TGT's PAC_CREDENTIAL_INFO field holds the NTLM hash
+   -> extract it -> reusable NT hash
+```
 
 ## TODO
 

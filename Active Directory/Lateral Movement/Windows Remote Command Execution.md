@@ -1,4 +1,4 @@
-**Windows remote command execution** — once you hold usable authentication material for an account with rights on a target (a password, an NT hash, a Kerberos ticket, or an AES key), run commands on that host. This is the common final step of most AD attacks ("use the ticket / hash to get a shell").
+**Windows remote command execution** — when you hold proof-of-identity for an account that has rights on a remote Windows machine, you use it to run commands on that box and land a shell. The proof can be the account's password, its NT hash (the scrambled form of the password that Windows will accept in place of the plaintext), a Kerberos ticket (a signed token that vouches you already logged in), or an AES key (the account's Kerberos encryption key). Mechanically, a tool authenticates to the target over SMB (445), WMI/DCOM (135), or WinRM (5985/5986) and starts your process there; most of these require the account to be local admin on the target. This is the common final step of most AD attacks — "use the ticket / hash to get a shell".
 
 ## Authentication material
 

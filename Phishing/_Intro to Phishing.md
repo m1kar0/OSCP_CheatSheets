@@ -1,4 +1,4 @@
-**Phishing (initial access)** — the tradecraft of getting a foothold by convincing a human to run your payload or hand over credentials/session tokens. This folder covers the delivery techniques, not the C2/implant that follows.
+**Phishing (initial access)** — the craft of getting your first foothold inside a target by convincing a real person to run your payload or hand over their credentials or session tokens (the cookies a site issues to keep them logged in after MFA). This folder is about the *delivery* techniques — how you get code running or credentials captured — not the command-and-control (C2) implant that runs afterward.
 
 **Note:** For authorized engagements only (a signed scope / rules of engagement). Everything here is dual-use - the Detection & OPSEC sections double as blue-team guidance.
 

@@ -1,10 +1,10 @@
-**NTLM relay to SMB** — whenever SMB signing is not enforced on a server, you can relay an NTLM authentication to it and act on behalf of the authenticating client. What you can do depends on that client's privileges.
+**NTLM relay to SMB** — SMB is the Windows file-sharing protocol. Whenever SMB signing (a per-message integrity check that binds the session to the original client) is not enforced on a server, you relay a victim's NTLM authentication to that server and it treats your connection as the victim. What you can actually do there depends entirely on that client's privileges.
 
 Common scenarios:
 - Relay a **Domain Admin** to a critical application server and **execute commands** as admin.
 - Relay an **unprivileged user** to a file server and access files on their behalf.
 
-**Note:** SMB signing is enforced on Domain Controllers and Exchange servers by default.
+**Note:** SMB signing is enforced on Domain Controllers by default - but *not* on a default Exchange member server, so an Exchange host can be a valid relay target.
 
 ## Discovery
 

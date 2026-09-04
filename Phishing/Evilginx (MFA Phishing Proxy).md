@@ -1,6 +1,13 @@
-**Evilginx (MFA phishing proxy)** — a man-in-the-middle reverse proxy that sits between the victim and the *real* login site. The victim authenticates against the genuine service through Evilginx, so it transparently captures the **credentials and the post-MFA session cookies/tokens**. Importing those cookies into your browser gives an authenticated session - **defeating MFA** (you inherit an already-authenticated session, you don't crack the second factor).
+**Evilginx (MFA phishing proxy)** — a reverse proxy (a server that quietly relays traffic both ways) planted in the middle between the victim and the *real* login site. Because the victim actually logs in to the genuine service — password, MFA and all — *through* Evilginx, it transparently captures both the **credentials and the post-MFA session cookies/tokens** the site issues to say "this person already passed login". Import those cookies into your own browser and you drop straight into an already-authenticated session — **defeating MFA** not by cracking the second factor but by stealing the session it produced.
 
 **Note:** Authorized engagements only. Evilginx should be run against parties who have signed off on being phished. The Detection & OPSEC section is equally useful to defenders.
+
+```
+victim -> Evilginx proxy (look-alike domain) -> real login site
+victim <- Evilginx proxy <----------- real login site
+Evilginx logs: username + password + session cookies
+attacker imports cookies -> rides authenticated session
+```
 
 ## How it works
 

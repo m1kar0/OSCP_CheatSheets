@@ -1,4 +1,10 @@
-**Internal domain recon** — recover an organization's internal AD domain name from the outside, before you have a foothold.
+**Internal domain recon** — work out an organization's internal Active Directory domain name (like `corp.contoso.com`) from the outside, before you have any foothold, because almost every later AD attack needs that name. The highest-yield trick: many internet-facing endpoints (ADFS, Exchange/OWA) still accept NTLM authentication, and when you send them an NTLM negotiate message they answer with a challenge that leaks the AD domain, NetBIOS name, and server FQDN in cleartext — you just decode it.
+
+```
+you -> GET + NTLM Type-1 (Negotiate)     -> ADFS/OWA endpoint
+you <- 401 WWW-Authenticate: NTLM Type-2 challenge
+       Type-2 discloses AD domain, NetBIOS, server FQDN
+```
 
 Sources:
 - OSINT (public documents, leaks, lists of servers / internal links).

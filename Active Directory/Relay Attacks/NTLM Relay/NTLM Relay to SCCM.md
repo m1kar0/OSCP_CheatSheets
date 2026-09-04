@@ -1,4 +1,12 @@
-**NTLM relay to SCCM** — if SCCM (Microsoft Configuration Manager) is deployed in the domain, an NTLM relay against its "AdminService" API can let you take over the SCCM infrastructure or retrieve Network Access Account (NAA) credentials.
+**NTLM relay to SCCM** — SCCM (Microsoft Configuration Manager) is the tool admins use to push software and updates to every machine in the domain, and it accepts NTLM logins on more than one endpoint — so if you coerce a domain machine to authenticate and relay it, which win you get depends on where you relay. Relay to the management point's **client endpoint** (`/ccm_system_windowsauth/request`) and register a fake device, and it hands you the machine/NAA policy — the Network Access Account (NAA) credentials, a set of domain credentials SCCM stores so clients can fetch software, and a handy account for you. Relay to the **AdminService API** instead and that is a *separate* attack: SCCM site takeover, e.g. adding yourself as a Full Administrator — not NAA dumping.
+
+```
+attacker -> machine: coerce NTLM authentication
+machine -> attacker: NTLM over HTTP
+attacker -> SCCM client endpoint (/ccm_system_windowsauth/request): relay, register fake device
+SCCM -> attacker: machine/NAA policy (encrypted) -> decrypt
+(relay to AdminService API instead -> SCCM site takeover / Full Admin)
+```
 
 ## Discovery
 

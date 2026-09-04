@@ -1,4 +1,4 @@
-**Skeleton Key** — patch LSASS on a Domain Controller (mimikatz `misc::skeleton`) so a master password is accepted for *any* domain account alongside the real one. Grants stealthy, domain-wide authentication until the DC reboots (in-memory only).
+**Skeleton Key** — patch the memory of a Domain Controller so that one **fixed, hardcoded** master password logs in as *any* domain account, while each account's own password still works too. The trick tampers with LSASS (the Windows process that handles logins and holds credential secrets) using mimikatz `misc::skeleton`, injecting a backdoor into how it checks passwords. You do not get to choose the password — `misc::skeleton` always sets it to `mimikatz` — so after that you can authenticate as any user with that one password: a stealthy, domain-wide backdoor. It lives only in memory, so it grants access until the DC reboots and is lost on restart.
 
 ## TODO
 

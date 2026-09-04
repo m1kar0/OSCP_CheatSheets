@@ -1,4 +1,10 @@
-**Golden Certificate** — with the Enterprise CA's private key you can forge client-authentication certificates for *any* principal, offline and indefinitely (until the CA cert is rotated). A powerful ADCS persistence primitive (a.k.a. CA key theft / DPERSIST1).
+**Golden Certificate** — the CA (Certificate Authority — the server that signs every certificate the domain trusts) holds a private key that vouches for all of them. If you steal that key, you can forge a valid login certificate for any account you like — a Domain Admin included — sign it yourself, and use it to authenticate. Because you are minting genuine certificates offline, this keeps working indefinitely, until the CA's own certificate is rotated. It is a powerful ADCS persistence trick (a.k.a. CA key theft / DPERSIST1).
+
+```
+admin on CA -> steal the CA private key
+   -> forge a login cert for any account, signed with that key
+   -> PKINIT with it -> TGT / NT hash as that account
+```
 
 ## TODO
 

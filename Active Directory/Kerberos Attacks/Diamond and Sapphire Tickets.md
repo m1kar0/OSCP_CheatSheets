@@ -1,4 +1,10 @@
-**Diamond & Sapphire tickets** — stealthier TGT forgery than a [Golden Ticket](../Persistence/Golden%20Ticket.md), designed to survive detections that flag wholly-forged tickets. Both still need the `krbtgt` key, but they base the ticket on *legitimate* material so the PAC and ticket fields look real.
+**Diamond & Sapphire tickets** — two quieter ways to forge a TGT (the domain's master login ticket) that hands you any identity and group you choose, built to slip past defenders who flag tickets forged from scratch. Like a [Golden Ticket](../Persistence/Golden%20Ticket.md) both still need the `krbtgt` key — the domain's ticket-signing master key — but instead of fabricating everything they start from *legitimate* Kerberos material, so the PAC (the part of a ticket that lists your group memberships) and the ticket fields look real. A **diamond ticket** requests a normal TGT, decrypts it with the `krbtgt` key, edits the PAC, and re-encrypts it. A **sapphire ticket** skips PAC editing and embeds a real privileged user's PAC pulled via S4U2self + U2U (Kerberos self-ticket tricks that let you pull that admin's ticket/PAC data), so the group membership is authentically that admin's.
+
+```
+Diamond: real TGT -> decrypt w/ krbtgt -> edit PAC -> re-encrypt
+Sapphire: S4U2self + U2U -> pull admin's real PAC -> embed it
+Both -> ticket fields/PAC look genuine, evade forgery detection
+```
 
 ## How it works
 

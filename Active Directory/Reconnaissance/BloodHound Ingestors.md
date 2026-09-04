@@ -1,4 +1,4 @@
-**BloodHound ingestors** — collectors that run as any domain user to gather publicly readable AD information and feed it into [BloodHound](BloodHound.md).
+**BloodHound ingestors** — collectors you run as any ordinary domain user to pull the Active Directory data that BloodHound turns into attack-path graphs. Most AD objects — users, groups, ACLs — are readable by any authenticated account over LDAP, so an ingestor simply enumerates them and saves JSON/ZIP files that you feed into [BloodHound](BloodHound.md). **Logged-on sessions are different**: that is runtime state the ingestor gathers by connecting to each computer individually (which typically needs local admin on the host), and it is why session collection is the noisy, risky part. Pick the one that fits your foothold: `bloodhound-python` on Linux, `SharpHound.exe` on Windows, or an AD Explorer snapshot converted with `ADExplorerSnapshot.py`.
 
 ## BloodHound.py (Linux)
 

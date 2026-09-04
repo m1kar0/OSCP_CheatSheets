@@ -1,4 +1,4 @@
-**Dump the Windows registry hives (SAM / SECURITY / SYSTEM)** — with local admin or `SYSTEM` on a host you can extract the three hives that hold its secrets: local account NT hashes (SAM), LSA secrets and cached domain logons (SECURITY), and the boot key that decrypts them (SYSTEM).
+**Dump the Windows registry hives (SAM / SECURITY / SYSTEM)** — copy out the passwords a single Windows machine keeps to itself. The registry (Windows' central settings database) stores this machine's secrets inside three "hives" — named sections of that database — and once you have local administrator or `SYSTEM` rights on the box you can extract all three: the local-account NT hashes (the stored form of each password) in SAM, the LSA secrets and cached domain logons in SECURITY, and the boot key that decrypts the other two in SYSTEM. LSA is the Windows component that guards local security secrets.
 
 What you get:
 - **SAM** - NT hashes of local accounts (including the local `Administrator`).

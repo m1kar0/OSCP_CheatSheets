@@ -1,4 +1,12 @@
-**Constrained delegation (KCD)** — an account configured with `msDS-AllowedToDelegateTo` may request Kerberos tickets to the listed SPNs *on behalf of other users* (S4U2proxy). If you compromise such an account, you can impersonate any user - including a Domain Admin - to those services. With **protocol transition** enabled you don't even need the user to authenticate first.
+**Constrained delegation (KCD)** — some accounts are trusted to reach a fixed list of services *on your behalf*, and if you own such an account you can ride that trust to log into those services as anyone you like — including a Domain Admin. The allowed list lives in the account's `msDS-AllowedToDelegateTo` attribute (each entry is an SPN — a label that ties a service to an account), and the account requests the impersonated ticket via S4U2proxy, the Kerberos step that asks the KDC for a ticket to a target *on behalf of another user*. With **protocol transition** enabled you don't even need that user to have authenticated first: the account mints its own evidence ticket with S4U2self, then feeds it to S4U2proxy.
+
+```
+you (deleg acct) -> KDC: S4U2self, evidence tkt for Admin
+KDC -> you: evidence ticket (as Admin)
+you -> KDC: S4U2proxy + evidence tkt, service on TARGET
+KDC -> you: service ticket to TARGET as Admin
+you -> TARGET: authenticate as Admin
+```
 
 **Note:** Two flavours:
 - **Without protocol transition** (`TrustedToAuthForDelegation` off) - the account can only forward a Kerberos ticket a user already presented. Harder to abuse standalone.

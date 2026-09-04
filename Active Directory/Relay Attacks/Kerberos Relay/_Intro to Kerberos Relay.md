@@ -1,4 +1,12 @@
-**Kerberos relay** — long thought impossible, Kerberos authentication *can* be relayed (James Forshaw, 2021). Unlike NTLM relay, the trick is not passing a challenge/response along but **controlling which SPN the victim requests a ticket for**, so the service ticket it emits can be replayed against a service you can reach.
+**Kerberos relay** — relaying means catching one machine's authentication and replaying it to another service as that victim; Kerberos (Windows' ticket-based login system) was long thought immune, but James Forshaw showed in 2021 that it *can* be done. Unlike NTLM relay, the trick is not passing a challenge/response along but **controlling which SPN the victim requests a ticket for** (an SPN is the label that names the service a ticket is meant for), so the service ticket it emits can be replayed against a service you can reach.
+
+```
+control which SPN the victim requests
+victim -> KDC: TGS-REQ for that SPN
+KDC -> victim: TGS-REP (service ticket)
+victim -> service: AP-REQ  (you capture this)
+replay AP-REQ -> target service you can reach
+```
 
 ## Why Kerberos was thought un-relayable
 

@@ -1,4 +1,11 @@
-**DHCP poisoning** — spoof DHCP replies on the local segment to inject network settings (rogue DNS/WPAD) into requesting clients, then capture or relay their authentication. Works over IPv4 (Responder) and, more reliably on modern Windows, over IPv6 (mitm6).
+**DHCP poisoning** — when a machine joins a network it broadcasts a DHCP request asking who hands out its settings (DHCP gives each client an IP address, a gateway, and a DNS server). You race the real server and answer first, handing the victim your own IP as its DNS server plus a rogue WPAD entry (WPAD is how Windows auto-discovers a web proxy). Its lookups and proxy logins now flow through you, so you can capture or relay that authentication. This works over IPv4 with Responder and, more reliably on modern Windows, over IPv6 with mitm6.
+
+```
+victim -> broadcast: DHCP request (who sets me up?)
+attacker -> victim: rogue reply (DNS = you, WPAD)
+victim -> attacker: name lookups + proxy logins
+attacker: capture or relay the NTLM authentication
+```
 
 ## IPv4 (Responder)
 

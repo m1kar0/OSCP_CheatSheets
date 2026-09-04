@@ -1,4 +1,4 @@
-**AS-REP Roasting** — request a TGT for any account that has Kerberos pre-authentication disabled, then crack the encrypted part of the reply offline to recover the account's password.
+**AS-REP Roasting** — some accounts are set so the domain hands out their login ticket without first making you prove who you are, and you turn that reply into their password. Any account carrying the "Do not require Kerberos pre-authentication" flag is fair game: you ask for its TGT — the domain's master login ticket — and no credentials for that account are needed. The reply (AS_REP) contains a blob encrypted with the account's password hash. Mechanically: the attack hits the first step of the Kerberos exchange (AS_REQ + AS_REP), so you crack that blob offline to recover the cleartext password.
 
 ## How it works
 

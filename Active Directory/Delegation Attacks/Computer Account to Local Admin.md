@@ -1,4 +1,12 @@
-**Machine account to local admin (S4U2self)** — in case you obtained some credentials to a workstations computer account but with out admin rights, you can use this technique to elevate yourself to admin on that machine.
+**Machine account to local admin (S4U2self)** — you hold a workstation's *computer account* password or NT hash but have no admin rights anywhere; this turns that into full admin on the same box. It works because Kerberos lets an account ask the domain's login server (the KDC) for a service ticket *to itself* while impersonating another user — a feature called S4U2self. Mechanically: grab a TGT (the domain's master login ticket) for the machine account, run S4U2self to mint a ticket to the box impersonating a real local admin, and swap the service class to `cifs` so you can execute commands. Because the KDC issues that ticket with a genuine PAC (the part of a Kerberos ticket that lists your group memberships), it is stealthier than forging a Silver Ticket.
+
+```
+you (machine hash) -> KDC: ask for the machine's TGT
+KDC -> you: machine TGT
+you -> KDC: S4U2self, impersonate Admin, service=cifs
+KDC -> you: service ticket to the box as Admin
+you -> target (cifs): run commands as Admin
+```
 
 **Note:** Computer accounts have **no** admin privileges of their own - they behave like ordinary domain users. This technique does not use the machine account's *own* rights; it impersonates a *different* user who has admin rights on the box.
 ## Prerequisites

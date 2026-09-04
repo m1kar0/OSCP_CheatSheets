@@ -1,4 +1,4 @@
-**DPAPI abuse** — the Windows Data Protection API encrypts saved credentials (browsers, RDP, scheduled tasks, Wi-Fi, vaults) under per-user/machine masterkeys. With a user's password/hash, local SYSTEM, or the **domain DPAPI backup key** (from a DC), those secrets can be decrypted - domain-wide with the backup key.
+**DPAPI abuse** — pull back the passwords Windows quietly saves for people (browser logins, RDP connections, scheduled tasks, Wi-Fi, credential vaults) by decrypting them the same way Windows itself does. The Data Protection API (DPAPI) locks each of those secrets with a per-user or per-machine key called a **masterkey**, and that masterkey is in turn unlocked by the user's password. So if you have the user's password or NT hash, run as local `SYSTEM`, or hold the **domain DPAPI backup key** (a master unlock key that every DC keeps a copy of), you can decrypt the saved secrets — and the backup key opens every user's masterkey across the whole domain.
 
 ## TODO
 

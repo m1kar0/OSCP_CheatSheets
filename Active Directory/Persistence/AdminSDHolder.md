@@ -1,4 +1,11 @@
-**AdminSDHolder / SDProp** — the `AdminSDHolder` object's ACL is stamped onto all protected (Tier-0) groups and their members every ~60 minutes by the SDProp process. Writing a malicious ACE (e.g. `GenericAll` for a controlled user) onto AdminSDHolder yields self-healing rights over Domain Admins et al. - a durable persistence primitive.
+**AdminSDHolder / SDProp** — plant one permission on a single special object and Active Directory itself keeps re-granting you control over its most powerful groups. Every ~60 minutes a background process called SDProp copies the ACL (access control list — the set of permission entries on an object) from the `AdminSDHolder` object onto every protected Tier-0 group (Domain Admins, Enterprise Admins, and so on) and their members, overwriting whatever is there. Write a malicious ACE (an ACE — one entry in that permission list, e.g. `GenericAll` for a user you control) onto AdminSDHolder and SDProp stamps that right onto Domain Admins for you, self-healing even after a defender removes it — a durable persistence primitive.
+
+```
+you: write GenericAll ACE -> AdminSDHolder object
+SDProp timer (~60 min) -> copies its ACL onto
+  Domain Admins, Enterprise Admins + members
+=> your rights re-appear even after cleanup
+```
 
 ## TODO
 

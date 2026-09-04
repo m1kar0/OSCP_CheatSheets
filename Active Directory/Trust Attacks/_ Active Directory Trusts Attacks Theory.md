@@ -1,6 +1,6 @@
+**Active Directory Trust Attacks** — a trust is a configured link between two domains that lets users of one domain authenticate and use resources in the other, and attackers ride those links to move from a domain they already own into a neighbouring one. Once you control one domain in a large org you rarely stop there: because domains are wired together with trusts, the tickets and credentials honoured on one side are accepted on the other, opening a path for lateral movement across the whole forest and sometimes into separate forests. Mechanically a trust stores a shared inter-realm key, so a Kerberos ticket issued by one domain's DC can be validated by the other domain's DC — which is exactly what the attacks below forge, escalate, or relay.
+
 * The base: https://blog.harmj0y.net/redteaming/the-trustpocalypse/
- 
- Once you have compromised a domain within a large Corp you may need to continue compromising its other domains. Domains share Trusts between each other making such lateral movement possible:
  
 ## Active Directory Trust Relationships
 

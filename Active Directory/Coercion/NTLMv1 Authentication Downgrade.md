@@ -1,4 +1,10 @@
-**NTLMv1 authentication downgrade** — coerce a target (ideally a Domain Controller) to authenticate to you with the weak NTLMv1 protocol and a fixed server challenge, then recover the NT hash in minutes with rainbow tables (crack.sh) or relay the authentication elsewhere.
+**NTLMv1 authentication downgrade** — force a target (ideally a Domain Controller) to prove its identity using NTLMv1, an old challenge/response scheme so weak that its answer can be reversed straight back into the account's NT hash — the raw password hash Windows uses to log in. The trick is a fixed server challenge (`1122334455667788`): you set it in Responder so the target's response is computed against a value you already know, which lets crack.sh look the NT hash up in precomputed rainbow tables in minutes. From there you either use the hash directly, or relay the authentication elsewhere — NTLMv1 has no message integrity, so adding `--remove-mic` to ntlmrelayx lets you relay it even to a signing-required protocol like LDAP.
+
+```
+you set challenge 1122334455667788 in Responder
+target --NTLMv1 resp = f(NT hash, fixed chal)--> you
+you --submit resp--> crack.sh --rainbow table--> NT hash
+```
 
 ## Background
 

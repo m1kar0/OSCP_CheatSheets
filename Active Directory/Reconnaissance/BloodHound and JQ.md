@@ -1,4 +1,4 @@
-**BloodHound and jq** — parse the JSON files produced by a BloodHound ingestor with `jq`, as if they were a database. Handy for quick offline queries without loading the GUI.
+**BloodHound and jq** — query the raw JSON that a BloodHound ingestor produces straight from the command line with `jq` (a small tool for filtering JSON), so you can answer quick questions without starting neo4j or the GUI. Each dump is just a `.data[]` array of objects, so you filter and print exactly the fields you want — enabled users, Kerberoastable accounts, stale computers, and so on. It is fast, scriptable, and easy to pipe into your other tools.
 
 ## Basics
 

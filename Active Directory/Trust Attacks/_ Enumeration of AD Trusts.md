@@ -1,4 +1,4 @@
-There are various tools and ways to enumerate. Try to use those tools that suit your environment and provide stealth.
+**Enumeration of AD Trusts** — before you can abuse a trust you first have to find it, so this step maps which other domains your current domain trusts, in which direction each link points, and what type it is, so you know where lateral movement is even possible. Several tools return the same trust facts (BloodHound, SharpHound, PowerView, or the built-in ActiveDirectory module) — pick the one that already runs in your environment and gives you the most stealth.
 
 ### BloodHound
 

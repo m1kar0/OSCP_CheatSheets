@@ -1,4 +1,4 @@
-**PingCastle** — quickly scores an Active Directory's security posture and flags common misconfigurations. Good for a fast "state of the domain" overview at the start of an internal engagement.
+**PingCastle** — a tool that scans a whole Active Directory domain and grades its security posture, flagging common misconfigurations (weak trusts, stale accounts, dangerous permissions) in a single HTML report. Point it at any reachable DC — even from a non-domain-joined machine — run `--healthcheck`, and read the report for a fast "state of the domain" overview at the start of an internal engagement.
 
 ## Usage
 

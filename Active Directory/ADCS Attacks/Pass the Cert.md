@@ -1,4 +1,9 @@
-**Pass the Cert** — a certificate obtained through AD CS can be used to recover the account's NT hash via PKINIT (when configured), or to authenticate directly on services that support TLS + client-certificate auth (e.g. LDAPS) when PKINIT is not available.
+**Pass the Cert** — once you hold a login certificate for an account (obtained through an AD CS attack), that certificate *is* the account's credential, so you can use it in place of a password. If PKINIT — Kerberos' certificate-based logon — is configured, you exchange the certificate for a TGT (the domain's master login ticket) and can even pull back the account's NT hash. If PKINIT is not available, you can still authenticate directly to services that accept a client certificate over TLS, such as LDAPS, and act as that account there.
+
+```
+cert + PKINIT    -> TGT -> account's NT hash
+cert, no PKINIT  -> LDAPS client-cert auth -> act as the account
+```
 
 ## Discovery
 

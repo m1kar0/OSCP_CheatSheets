@@ -1,4 +1,4 @@
-**NTLM relay to LDAP** — often overlooked but very powerful. Relaying an NTLM authentication to a Domain Controller's LDAP service lets you dump the domain, create computer accounts, and escalate to admin via RBCD or Shadow Credentials.
+**NTLM relay to LDAP** — LDAP is the directory protocol a Domain Controller speaks to read and write its objects (users, computers, and their attributes). Often overlooked but very powerful: relay a victim's NTLM authentication to a DC's LDAP service and you act as them in the directory — dump the whole domain, create computer accounts, and escalate to admin via RBCD (Resource-Based Constrained Delegation) or Shadow Credentials (planting a certificate on an account so you can log in as it).
 
 **Warning:** Read the Common pitfalls section before attempting any of these attacks.
 

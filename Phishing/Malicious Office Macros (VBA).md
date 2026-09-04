@@ -1,4 +1,4 @@
-**Malicious Office macros (VBA)** — embed VBA in a Word/Excel document that runs on open. The classic initial-access vector, now heavily degraded: since 2022 Office blocks macros in files carrying Mark-of-the-Web (MOTW) by default, so this mostly works against legacy `.doc`/`.xls`, internal file shares (no MOTW), or when paired with a container that strips MOTW.
+**Malicious Office macros (VBA)** — embed VBA code (Office's built-in Visual Basic scripting) in a Word or Excel document so it runs automatically the moment the file is opened. This was the classic way to get code running on a target, but it is now heavily degraded: since 2022 Office blocks macros by default in any file carrying the Mark-of-the-Web (MOTW) — the tag stamped on files that arrive from the internet or email. So it mostly still works against legacy `.doc`/`.xls` files, documents on internal file shares (which carry no MOTW), or when the document is wrapped in a container that strips MOTW.
 
 ## How it works
 

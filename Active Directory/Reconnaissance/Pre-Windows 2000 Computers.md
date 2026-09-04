@@ -1,4 +1,4 @@
-**Pre-Windows 2000 computers** — when a computer account is created with "Assign this computer account as a pre-Windows 2000 computer" checked, it gets a default password: the lowercase account name without the trailing `$` (e.g. `FOOBAR$` -> `foobar`). It is reset to a random value on first logon, so only never-used accounts are exploitable.
+**Pre-Windows 2000 computers** — get valid domain credentials for free by guessing the predictable default password of a computer account that was created but never used. When an account is made with "Assign this computer account as a pre-Windows 2000 computer" checked, its password is simply the lowercase account name without the trailing `$` (e.g. `FOOBAR$` -> `foobar`). That password is reset to a random value the first time the machine logs on, so only never-used accounts are still exploitable — you find them, confirm the default password, and log in as the computer.
 
 ## Discovery
 

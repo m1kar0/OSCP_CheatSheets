@@ -1,4 +1,11 @@
-**Kerberos relay to LDAP (KrbRelayUp)** — from a local (non-admin) access on a domain-joined Windows machine, coerce a service running as `NT AUTHORITY\SYSTEM` to authenticate over RPC/DCOM using Kerberos with an arbitrary SPN, and relay that authentication to a Domain Controller's LDAP service (when LDAP signing / Channel Binding is not enforced). The relayed session is then used like the [NTLM Relay to LDAP](../NTLM%20Relay/NTLM%20Relay%20to%20LDAP.md) attacks (RBCD or Shadow Credentials) - the end result is local admin (SYSTEM).
+**Kerberos relay to LDAP (KrbRelayUp)** — from a plain (non-admin) foothold on a domain-joined Windows machine, you force a local service running as `NT AUTHORITY\SYSTEM` (the box's highest local account) to log in over RPC/DCOM with Kerberos, then forward that login to a Domain Controller's LDAP service. Because you get to choose the SPN — the label that names the service a ticket is meant for — you steer the ticket to a service you can abuse. Mechanically: this only lands when the DC does not enforce LDAP signing / Channel Binding; the relayed LDAP session is then driven exactly like the [NTLM Relay to LDAP](../NTLM%20Relay/NTLM%20Relay%20to%20LDAP.md) attacks (RBCD or Shadow Credentials), and the end result is local admin (SYSTEM).
+
+```
+local SYSTEM service -> forced Kerberos auth (SPN you pick)
+attacker relay -> DC LDAP (no signing / channel binding)
+write RBCD or Shadow Credentials on a target account
+-> take over that account -> local admin (SYSTEM)
+```
 
 ## Discovery
 

@@ -1,4 +1,4 @@
-**DACL abuse primitives** — how to convert each dangerous ACE (see [_Intro to ACL Attacks](_Intro%20to%20ACL%20Attacks.md)) into credentials, group membership, or replication rights. One method per edge, Linux and Windows.
+**DACL abuse primitives** — an ACE is one entry in an Active Directory object's permission list, saying who may do what to it; this page is the cookbook for turning each dangerous ACE you hold into something usable — a known password, membership in a privileged group, or the replication rights behind DCSync. You pick the recipe that matches the edge you already confirmed (see [_Intro to ACL Attacks](_Intro%20to%20ACL%20Attacks.md)) and run it. One method per edge, Linux and Windows.
 
 ## Discovery
 

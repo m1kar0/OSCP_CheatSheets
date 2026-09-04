@@ -1,4 +1,11 @@
-**mitm6 Kerberos relay to ESC-8** — abuse IPv6 DNS spoofing (mitm6) to make a victim (ideally a Domain Controller or high-privileged computer account) authenticate over Kerberos to a name you control, then relay that authentication with krbrelayx to the AD CS web-enrollment endpoint. The result is a certificate for the relayed machine account → PKINIT → often SYSTEM / DCSync.
+**mitm6 Kerberos relay to ESC-8** — make a victim machine log in to you, then reuse that login to mint a certificate that impersonates it, usually ending in SYSTEM or full-domain takeover. Windows prefers IPv6, so you run mitm6 to hand out a rogue DHCPv6 lease that makes you the victim's DNS server; when the victim — ideally a Domain Controller or other high-privileged computer account — resolves a name it authenticates to you over Kerberos. krbrelayx forwards (relays) that Kerberos authentication to the AD CS web-enrollment endpoint (ESC8 — a Certificate Authority that issues certs over HTTP with no channel binding), which returns a certificate for the relayed machine account. You then hand that certificate to certipy for PKINIT — Kerberos login with a certificate instead of a password — to recover the account's NT hash or a TGT (its master login ticket); a DC machine account means DCSync (abuse the DC's replication to dump all domain password hashes) and the whole domain.
+
+```
+mitm6 (rogue DHCPv6/DNS) -> Victim resolves attacker name
+Victim --Kerberos AP-REQ--> krbrelayx
+krbrelayx --relay--> AD CS web enroll (ESC8) -> VICTIM$.pfx
+VICTIM$.pfx --PKINIT--> NT hash / TGT -> DCSync (if DC)
+```
 
 ## Discovery
 

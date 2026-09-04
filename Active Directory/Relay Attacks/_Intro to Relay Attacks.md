@@ -1,3 +1,4 @@
+**Relay Attacks** — you grab an authentication that a victim machine or user sends to you (its NTLM handshake — the challenge/response Windows uses to prove who it is) and forward it untouched to a different service that trusts that victim. You never crack a password; you sit in the middle and the target treats you as the victim, so you inherit whatever the victim was allowed to do. Mechanically you first coerce or poison the victim into authenticating to you, then relay that live session to a target (SMB, LDAP, HTTP/ADCS (Active Directory Certificate Services), MSSQL) with ntlmrelayx before it expires. On Windows the built-in services grab the listening ports, so you run ntlmrelayx in RAW server mode and point lsarelayx at it (below).
 
 Display of various Coercion Methods vs Realy attacks (credit to https://www.thehacker.recipes):
 

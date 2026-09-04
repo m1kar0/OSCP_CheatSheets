@@ -1,4 +1,10 @@
-**Dump NTDS.dit** — `NTDS.dit` is the Active Directory database on every Domain Controller; it holds the NT hashes (and Kerberos keys) of every domain account, including `krbtgt`. Dumping it gives you the whole domain. Do it remotely with replication rights (DCSync), or on a DC you already control by copying the database file.
+**Dump NTDS.dit** — get your hands on the password hashes of every account in the domain at once. `NTDS.dit` is the single database file, stored on every Domain Controller (DC), that Active Directory uses to hold all accounts and their secrets: the NT hashes (the scrambled form of each password that Windows actually stores) and Kerberos keys of every user and computer, including `krbtgt` — the account whose hash lets you forge tickets for anyone. Owning this file means owning the whole domain. You can grab its contents two ways: remotely, by asking a DC to replicate the secrets to you (DCSync, which needs replication rights), or on a DC you already control, by copying the locked database file off disk and decrypting it offline.
+
+```
+Remote: you (repl. rights) -> DC replicate -> NT hashes returned
+On DC:  admin/SYSTEM -> copy ntds.dit + SYSTEM hive -> decrypt offline
+Both yield every account hash, incl. krbtgt = whole domain
+```
 
 ## Discovery - who can DCSync
 

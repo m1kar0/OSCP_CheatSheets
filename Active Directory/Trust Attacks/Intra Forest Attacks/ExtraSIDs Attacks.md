@@ -1,4 +1,11 @@
-**ExtraSIDs / SID history (child -> parent forest takeover)** — in an intra-forest trust there is no SID filtering, so you can inject the SID of the root domain's **Enterprise Admins** group into a Golden Ticket forged in a compromised child domain. The result is Enterprise Admin across the whole forest.
+**ExtraSIDs / SID history (child -> parent forest takeover)** — every account and group in AD has a SID (a security identifier — the unique number Windows actually checks for access decisions), and a Kerberos ticket can also carry extra SIDs in its SID-history field. Inside a single forest there is no SID filtering to strip those out, so in a child domain you already control you forge a Golden Ticket (a ticket you mint yourself using the domain's krbtgt key) and stuff in the SID of the root domain's **Enterprise Admins** group (RID 519). The DC honors that field, and your ticket now grants Enterprise Admin across the whole forest.
+
+```
+child DC krbtgt hash
+   -> forge Golden Ticket + Enterprise Admins SID (RID 519)
+   -> present to root DC (no SID filtering within a forest)
+   -> honored as Enterprise Admin -> DCSync the root DC
+```
 
 **Note:** This works within a forest (e.g. a parent/child two-way trust). It does **not** work across cross-forest trusts, and it is blocked when SID filtering is enforced.
 

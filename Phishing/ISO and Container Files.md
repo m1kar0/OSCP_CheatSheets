@@ -1,4 +1,4 @@
-**ISO and container files (ISO / IMG / VHD / VHDX)** — package your payload inside a disk-image container. When the victim double-clicks the container it auto-mounts as a drive, and the files inside historically do **not** inherit Mark-of-the-Web (MOTW) - so the LNK/executable inside runs without Protected View or SmartScreen friction.
+**ISO and container files (ISO / IMG / VHD / VHDX)** — hide your payload inside a disk-image file. When the victim double-clicks it, Windows *mounts* it as a drive rather than extracting it, and the files inside historically do **not** inherit the Mark-of-the-Web (MOTW) — the hidden "downloaded from the internet" tag that triggers Protected View and SmartScreen warnings. So the LNK shortcut or executable you tucked inside runs with none of that friction; this is the wrapper that replaced macros as the go-to delivery method, though recent Windows builds have begun propagating MOTW to mounted contents, so test against the target's patch level.
 
 ## How it works
 

@@ -1,4 +1,10 @@
-**DCSync** — abuse the directory replication rights `DS-Replication-Get-Changes` + `DS-Replication-Get-Changes-All` to ask a Domain Controller to replicate account secrets to you (over MS-DRSR), without running code on the DC. It is fundamentally an **ACL abuse**: any principal granted those rights - not just Domain Admins - can pull any account's hash, including `krbtgt`. For the full domain-database dump and on-DC methods, see [Dump NTDS.dit](Dump%20NTDS.dit.md); this page is the focused, ACL-centric view.
+**DCSync** — trick a Domain Controller (DC) into handing you the password hashes of any account by pretending to be another DC asking for a routine sync. Domain Controllers keep each other up to date by copying account secrets between themselves (this is called replication, and runs over the MS-DRSR protocol); if your account holds the two replication rights `DS-Replication-Get-Changes` + `DS-Replication-Get-Changes-All`, you can send that same "please replicate to me" request and receive any account's hash — including `krbtgt` — without ever running code on the DC. It is fundamentally an **ACL abuse** (an ACL is an object's permission list): any principal granted those rights, not just Domain Admins, can do it. For the full domain-database dump and on-DC methods, see [Dump NTDS.dit](Dump%20NTDS.dit.md); this page is the focused, ACL-centric view.
+
+```
+You (with replication rights) -> DC: "replicate this account to me"
+DC -> You: the account's NT hash + Kerberos keys
+No code runs on the DC; it looks like normal DC-to-DC sync
+```
 
 ## Discovery
 

@@ -1,4 +1,4 @@
-**Read GMSA password** — group Managed Service Accounts store their auto-rotated password blob in the `msDS-ManagedPassword` attribute, readable only by principals listed in `msDS-GroupMSAMembership` (the BloodHound `ReadGMSAPassword` edge). If you control such a principal, recover the gMSA's NT hash and act as that (often privileged) account.
+**Read GMSA password** — a gMSA (group Managed Service Account) is a service account whose password Active Directory generates and rotates on its own, so no human ever types it; the current value sits in the `msDS-ManagedPassword` attribute and only the principals listed in `msDS-GroupMSAMembership` are allowed to read it (BloodHound draws this as the `ReadGMSAPassword` edge). If you control one of those principals, you read that blob, derive the gMSA's NT hash, and from then on authenticate as that often-privileged account. Mechanically the tools below pull `msDS-ManagedPassword` over LDAP and compute the NT hash (and AES keys) from it.
 
 ## Discovery
 

@@ -1,4 +1,4 @@
-**NTLM credentials gathering** — various tools capture the NTLM authentication of users and computers on the network. This note covers how to collect the data those tools produce so it can be cracked later.
+**NTLM credentials gathering** — once a poisoning or relay attack has made users and computers authenticate to you, you are left with Net-NTLM hashes — the challenge-response proofs of their passwords that Windows sends during NTLM authentication. This note is the collection step: how to pull those captured hashes out of each tool (Responder, ntlmrelayx, PCredz, NetworkMiner, NTLMRawUnHide) into a clean list you can crack later.
 
 ## Exploitation
 
