@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Phishing/HTML Smuggling.md",
+                "file": "Active Directory/ACL Attacks/_Intro to ACL Attacks.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "HTML Smuggling"
+              "title": "_Intro to ACL Attacks"
             }
           }
         ]
@@ -187,6 +187,18 @@
   },
   "active": "2ec91f4dbd6e7627",
   "lastOpenFiles": [
+    "Active Directory/Credential Dumping/Dump LSASS.md",
+    "Active Directory/WSUS Attacks/WSUS HTTP exploit.md",
+    "Active Directory/WSUS Attacks",
+    "Active Directory/Dumping Creds/LSASS dump.md",
+    "Active Directory/Dumping Creds",
+    "Active Directory/Active Directory cheatsheet.md",
+    "img/Pasted image 20260512100827.png",
+    "Android/Android Сheatsheet.md",
+    "Active Directory/ACL Attacks/_Intro to ACL Attacks.md",
+    "Phishing/_Intro to Phishing.md",
+    "Phishing/HTML Smuggling.md",
+    "Active Directory/Relay Attacks/NTLM Relay/NTLM Relay to SMB.md.tmp.36543.935b725f4413",
     "Active Directory/MSSQL Attacks/Linked Server Abuse.md",
     "Active Directory/MSSQL Attacks",
     "Active Directory/Credential Dumping/DPAPI.md",
@@ -206,24 +218,12 @@
     "Active Directory/ADCS Attacks/Golden Certificate.md",
     "Active Directory/Kerberos Attacks/Diamond and Sapphire Tickets.md",
     "Active Directory/Kerberos Attacks/Silver Ticket.md",
-    "Active Directory/Persistence/DCShadow.md",
-    "Active Directory/Persistence/DSRM Password.md",
-    "Active Directory/Persistence/AdminSDHolder.md",
-    "Active Directory/Persistence/Skeleton Key.md",
-    "Active Directory/Persistence/Golden Ticket.md",
     "Active Directory/Persistence",
-    "Phishing/Credential Harvesting (GoPhish).md",
-    "Phishing/QR Code Phishing (Quishing).md",
-    "Phishing/ClickFix.md",
     "Active Directory/Delegation Attacks",
     "Active Directory/Relay Attacks/Kerberos Relay",
     "Active Directory/Lateral Movement",
     "Active Directory/Credential Dumping",
     "Active Directory/Known Exploits",
-    "Active Directory/SCCM Attacks",
-    "Active Directory/Reconnaissance",
-    "Active Directory/Coercion",
-    "img/Pasted image 20260512100827.png",
     "Active Directory/Relay Attacks/Coercion Methods.png",
     "Untitled.canvas"
   ]
