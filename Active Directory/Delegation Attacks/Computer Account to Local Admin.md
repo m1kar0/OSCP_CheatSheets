@@ -1,26 +1,16 @@
-**Machine account to local admin (S4U2self)** — given a computer account's secret (NT hash, AES key, or password), mint a Kerberos Service Ticket to that same machine *on behalf of a domain user who is a local admin there* (typically a Domain Admin). The machine honours the ticket's PAC and grants you admin/`SYSTEM`. This is **S4U2self abuse**: every computer account has SPNs, and S4U2self needs no special delegation rights.
-
-## When is this useful?
-
-The catch that makes this technique look pointless: if you can read a machine's account secret, you often *already* have `SYSTEM` on it — in which case this adds nothing. The value is entirely in the cases where you hold a machine's secret **without** having compromised that machine:
-
-- **Coerce + crack (NTLMv1)** - force the machine to authenticate to you, capture NetNTLMv1, crack it to the machine's NT hash. No prior access to the box. See [NTLMv1 Authentication Downgrade](../Coercion/NTLMv1%20Authentication%20Downgrade.md).
-- **NTLM relay / add-computer** - relay to LDAP to create or take over a computer account, or recover a computer's key. See [NTLM Relay to LDAP](../Relay%20Attacks/NTLM%20Relay/NTLM%20Relay%20to%20LDAP.md).
-- **Machine password recovered elsewhere** - a machine account password/hash found in shares, backups, GPP, or another host's memory (a host is not local admin on *itself* by default, so this is not automatically circular).
-
-**Circular case (skip it):** if you obtained the hash by dumping *that machine's* own SAM/LSA/LSASS, you were already admin - use it for persistence/re-entry, not to "get" admin you already have.
+**Machine account to local admin (S4U2self)** — in case you obtained some credentials to a workstations computer account but with out admin rights, you can use this technique to elevate yourself to admin on that machine.
 
 **Note:** Computer accounts have **no** admin privileges of their own - they behave like ordinary domain users. This technique does not use the machine account's *own* rights; it impersonates a *different* user who has admin rights on the box.
+## Prerequisites
 
-## Discovery
+- **Coerce + crack (NTLMv1)** - force the machine to authenticate to you, capture NetNTLMv1, crack it to the machine's NT hash. No prior access to the box. See [NTLMv1 Authentication Downgrade](../Coercion/NTLMv1%20Authentication%20Downgrade.md).
+- **Machine password recovered elsewhere** - a machine account password/hash found in shares, backups, GPP, or another host's memory (a host is not local admin on *itself* by default, so this is not automatically circular).
 
-None in particular - you already hold the machine account's secret (see *When is this useful?*).
-
-**Warning:** Do not fully trust BloodHound's "Local Admin" data. Zero listed admins does not always mean there are none - the collector may just have failed to gather it. Domain Admins are local admins on domain-joined hosts by default, so impersonating `Administrator` is the reliable choice.
+**Persistence:** if you obtained the hash by dumping *that machine's* own SAM/LSA/LSASS, you were already admin - use it for persistence/re-entry, not to "get" admin you already have.
 
 ## Exploitation
 
-**Key requirement:** the user you impersonate must actually be a **local admin on the target**. Impersonating a random domain user yields a valid ticket and *zero* privilege on the box.
+**Key requirement:** the user you impersonate must actually be a **local admin on the target**.
 
 ### Method 1: S4U2self (preferred - legitimate PAC)
 
