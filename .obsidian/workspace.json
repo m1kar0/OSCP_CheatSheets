@@ -11,14 +11,10 @@
             "id": "2ec91f4dbd6e7627",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "WEB/Recon/Web attack surface recon.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "Web attack surface recon"
+              "title": "New tab"
             }
           }
         ]
@@ -187,8 +183,9 @@
   },
   "active": "2ec91f4dbd6e7627",
   "lastOpenFiles": [
-    "WEB/Recon/Services.md",
     "WEB/Recon/Web attack surface recon.md",
+    "WEB/Recon/web_attack_surface_recon.md",
+    "WEB/Recon/Services.md",
     "WEB/Web Cheatsheet.md",
     "WEB/API_cheatsheet.md",
     "WEB/02 - Web - Checklist.md",
@@ -218,7 +215,6 @@
     "Phishing/_Intro to Phishing.md",
     "Phishing/HTML Smuggling.md",
     "Active Directory/Relay Attacks/NTLM Relay/NTLM Relay to SMB.md.tmp.36543.935b725f4413",
-    "Active Directory/MSSQL Attacks/Linked Server Abuse.md",
     "Active Directory/MSSQL Attacks",
     "Active Directory/Persistence",
     "Active Directory/Delegation Attacks",
