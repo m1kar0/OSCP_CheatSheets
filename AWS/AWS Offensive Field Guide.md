@@ -25,15 +25,22 @@ Before anything else: get credentials loaded into a named profile so you never f
 configure a profile from leaked keys
 
 ```
-# Never bake keys into history — use a named profile
+# Keeps the key out of shell history: aws configure PROMPTS for the key and
+# reads it over stdin, so it's never a shell command line — nothing for
+# ~/.bash_history (or zsh) to record. Paste the key at the prompt, not as an arg.
 aws configure --profile target
 # paste AWS Access Key ID / Secret / region (us-east-1 is a safe default)
 
 # If you also have a session token (temporary creds):
-aws configure set aws_session_token <TOKEN> --profile target
+# NOTE: this passes the token AS AN ARGUMENT, so it DOES land in history.
+# Leading space skips it when HISTCONTROL=ignorespace/ignoreboth, or just
+# edit ~/.aws/credentials by hand instead.
+ aws configure set aws_session_token <TOKEN> --profile target
 
 # Everything from here on: append --profile target
 ```
+
+Still cleartext on disk Neither method is secret — both write the key in plaintext to `~/.aws/credentials`. "Not in history" ≠ "not readable": anyone who can read that file (or a shared/client box's backups) has your creds. The rule of thumb: interactive prompt → not in history; key-as-argument or `export AWS_SECRET_ACCESS_KEY=…` → in history; either way → still plaintext on disk.
 
 Scope first Confirm your engagement scope covers the account ID you're about to hit. The very first call below prints the account ID — check it against your rules of engagement before you do anything else.
 
