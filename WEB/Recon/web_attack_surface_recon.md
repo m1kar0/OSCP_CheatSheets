@@ -14,7 +14,7 @@ passive → AXFR → wildcard check → brute → permutations → resolve
 ## Contents
 
 - [Toolbox](#toolbox) · [Setup](#setup) · [BBRF](#bbrf)
-- [1. Passive names](#1-passive-names) · [2. AXFR](#2-zone-transfer-axfr) · [3. Wildcards](#3-wildcards)
+- [1. Passive](#1-passive) · [2. AXFR](#2-zone-transfer-axfr) · [3. Wildcards](#3-wildcards)
 - [4. Brute force](#4-brute-force) · [5. Permutations](#5-permutations) · [6. Consolidate and resolve](#6-consolidate-and-resolve)
 - [7. Delegation defects](#7-delegation-defects) · [8. IP pivot](#8-ip-pivot) · [9. Takeover](#9-subdomain-takeover)
 - [10. Web surface](#10-web-surface) · [11. Outputs](#11-outputs) · [What not to do](#what-not-to-do)
@@ -374,7 +374,7 @@ Healthy: `status=NOERROR authoritative=yes` on every line. **Finding:** `REFUSED
 
 Highest-impact check here. If an NS hostname sits under an unregistered domain, whoever registers it becomes authoritative for the zone.
 
-The awk is two-label only (`ns1.kgeu.ru` → `kgeu.ru`). It is wrong for `co.uk` / `com.au`.
+The awk is two-label only (`ns1.example.ru` → `example.ru`). It is wrong for `co.uk` / `com.au`.
 
 ```bash
 awk -F. '{print $(NF-1)"."$NF}' ns.txt | sort -u | while read -r apex; do
