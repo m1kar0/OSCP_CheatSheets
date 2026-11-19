@@ -11,7 +11,9 @@
 
 ## SMTP
 
-`sudo python -m smtpd -c DebuggingServer localhost:25`
+`sudo python3 -m aiosmtpd -n -l localhost:25`
+
+`# Python < 3.12: sudo python -m smtpd -c DebuggingServer localhost:25`
 
 ### Use Telnet to test SMTP
 

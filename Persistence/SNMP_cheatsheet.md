@@ -1,4 +1,4 @@
-# SNP Pentesting Cheatsheet
+# SNMP Pentesting Cheatsheet
 
 ### What is it
 
@@ -27,9 +27,9 @@ find some strings in `/usr/share/seclists/Discovery/SNMP/snmp-onesixtyone.txt`
 
 * refer to those references to get RCE if writable 
 
-https://book.hacktricks.xyz/network-services-pentesting/pentesting-snmp
+https://book.hacktricks.wiki/en/network-services-pentesting/pentesting-snmp/index.html
 
-https://book.hacktricks.xyz/network-services-pentesting/pentesting-snmp/snmp-rce
+https://book.hacktricks.wiki/en/network-services-pentesting/pentesting-snmp/snmp-rce.html
 
 * if not writable then just dump all snmp outputs and scroll through them
 

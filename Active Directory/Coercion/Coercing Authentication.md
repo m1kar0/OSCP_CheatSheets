@@ -29,19 +29,19 @@ By putting a port in the UNC path (e.g. `\\ATTACKER_IP@8000\share\foo.txt`) you 
 
 ## Discovery
 
-Print Spooler status (CrackMapExec):
+Print Spooler status (NetExec):
 
 ```bash
 
-cme smb 'TARGET' -u 'USER_NAME' -p 'USER_PASS' -M spooler
+nxc smb 'TARGET' -u 'USER_NAME' -p 'USER_PASS' -M spooler
 
 ```
 
-WebClient status (CrackMapExec):
+WebClient status (NetExec):
 
 ```bash
 
-cme smb 'TARGET' -u 'USER_NAME' -p 'USER_PASS' -M webdav
+nxc smb 'TARGET' -u 'USER_NAME' -p 'USER_PASS' -M webdav
 
 ```
 
@@ -172,7 +172,7 @@ attrib +s +h desktop.ini
 
 ## References
 
-- CrackMapExec - https://github.com/byt3bl33d3r/CrackMapExec
+- NetExec - https://github.com/Pennyw0rth/NetExec
 - WebClientServiceScanner - https://github.com/Hackndo/WebclientServiceScanner
 - printerbug.py (krbrelayx) - https://github.com/dirkjanm/krbrelayx
 - PetitPotam - https://github.com/topotam/PetitPotam

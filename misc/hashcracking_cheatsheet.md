@@ -116,8 +116,8 @@ copy  /etc/passwd and /etc/shadow
 
 then unshadow 
 
-`unshadow passwd shadow passwds.txt`
+`unshadow passwd shadow > passwds.txt`
 
 launch john
 
-`john --sordlist=/usr/share/rock.txt passwds.txt`
+`john --wordlist=/usr/share/wordlists/rockyou.txt passwds.txt`

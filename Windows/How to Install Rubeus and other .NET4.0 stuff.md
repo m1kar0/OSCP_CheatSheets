@@ -14,7 +14,7 @@ Copy-Item -Path "build\.NETFramework\v4.0\*" -Destination . -Recurse -Force
 # Cleanup
 Remove-Item "microsoft.netframework.referenceassemblies.net40.1.0.3.zip" -Force
 Remove-Item "build" -Recurse -Force
-````
+```
 
 ## 2. Build Rubeus
 

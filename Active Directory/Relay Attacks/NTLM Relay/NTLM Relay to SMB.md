@@ -12,7 +12,7 @@ List SMB servers and detect whether SMB signing is enforced:
 
 ```bash
 
-cme smb 'SUBNET'
+nxc smb 'SUBNET'
 
 ```
 
@@ -20,7 +20,7 @@ Generate a list of targets that do not enforce SMB signing:
 
 ```bash
 
-cme smb 'SUBNET' --gen-relay-list './hosts/smb_nosigning.txt'
+nxc smb 'SUBNET' --gen-relay-list './hosts/smb_nosigning.txt'
 
 ```
 
@@ -48,7 +48,7 @@ See how to collect the captured hashes in [NTLM Credentials Gathering](../../Poi
 
 ## References
 
-- CrackMapExec - https://github.com/byt3bl33d3r/CrackMapExec
+- NetExec - https://github.com/Pennyw0rth/NetExec
 - ntlmrelayx.py - https://github.com/fortra/impacket
 - The Hacker Recipes - NTLM Relay - https://www.thehacker.recipes/ad/movement/ntlm/relay
 - hackndo - https://en.hackndo.com/ntlm-relay/

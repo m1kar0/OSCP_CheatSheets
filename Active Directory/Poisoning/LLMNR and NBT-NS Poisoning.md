@@ -75,4 +75,4 @@ A basic Responder attack (LLMNR/NBT-NS poisoning) should not disrupt the local n
 ## References
 
 - Responder - https://github.com/lgandx/Responder
-- HackTricks - Spoofing LLMNR, NBT-NS, mDNS/DNS and WPAD and Relay Attacks - https://book.hacktricks.xyz/generic-methodologies-and-resources/pentesting-network/spoofing-llmnr-nbt-ns-mdns-dns-and-wpad-and-relay-attacks
+- HackTricks - Spoofing LLMNR, NBT-NS, mDNS/DNS and WPAD and Relay Attacks - https://book.hacktricks.wiki/en/generic-methodologies-and-resources/pentesting-network/spoofing-llmnr-nbt-ns-mdns-dns-and-wpad-and-relay-attacks.html

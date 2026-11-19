@@ -118,12 +118,12 @@ adb shell
 getprop | grep abi
 
 # upload correct frida to device
-push frida_86_something /data/local/tmp/frida86
+adb push frida_86_something /data/local/tmp/frida86
 
 # in device 
 adb shell
 chmod 700 /data/local/tmp/frida86
-./data/local/tmp/frida86
+/data/local/tmp/frida86
 ```
 
 #### CLIENT SIDE
@@ -225,8 +225,7 @@ For example, set some value to always true!
 
 ```bash
 
-android hooking set return_value sg.vp.owasp_mobile.OMTG_Android.OMTG_DATAST_001_BadEncryption.v
-erify true
+android hooking set return_value sg.vp.owasp_mobile.OMTG_Android.OMTG_DATAST_001_BadEncryption.verify true
 
 
 ```
@@ -257,7 +256,9 @@ then sign using the uber signing tool while in the directory with the needed apk
 
 ## Using objection
 
+```bash
 pip3 install objection
+```
 
 
 

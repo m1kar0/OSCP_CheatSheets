@@ -4,7 +4,7 @@ Cloud Pentest · Crash Course
 
 You already know network and host pentesting. In AWS the terrain moves up a layer: there's almost no "network" to kick down — the attack surface is **IAM, APIs, and misconfiguration**. This is the field reference I'd hand a pentester on day one. Copy commands freely; every block has a copy button.
 
-[00 · mindset](#mindset) [01 · setup](#setup) [02 · who-am-i](#whoami) [03 · scanners](#scanners) [04 · iam / privesc](#iam) [05 · s3](#s3) [06 · ec2 / imds](#ec2) [07 · lambda+](#serverless) [08 · eks / k8s](#eks) [09 · loot](#loot) [10 · opsec](#opsec)
+[00 · mindset](#00-the-mindset-shift) [01 · setup](#01-setup--authenticating-as-a-target-identity) [02 · who-am-i](#02-who-am-i-first-five-minutes) [03 · scanners](#03-the-scanners--what-to-run-and-when) [04 · iam / privesc](#04-iam-assessment--privilege-escalation) [05 · s3](#05-s3--object-storage) [06 · ec2 / imds](#06-ec2--the-metadata-service-imds) [07 · lambda+](#07-lambda-secrets--the-quieter-services) [08 · eks / k8s](#08-eks--kubernetes-on-aws) [09 · loot](#09-where-the-loot-lives) [10 · opsec](#10-opsec--staying-in-scope)
 
 ## 00 The mindset shift
 
@@ -192,7 +192,7 @@ Anonymous access Public buckets need no creds at all. Try `aws s3 ls s3://name -
 
 ## 06 EC2 & the metadata service (IMDS)
 
-"Elastic" in your list = EC2 (Elastic Compute Cloud), the VM service. The attacker's prize here is the instance metadata endpoint, which hands out the instance's role credentials.
+"Elastic" = EC2 (Elastic Compute Cloud), the VM service. The attacker's prize here is the instance metadata endpoint, which hands out the instance's role credentials.
 
 enumerate compute
 
@@ -256,7 +256,7 @@ aws ssm start-session --target i-0abc123 --profile target
 
 ## 08 EKS — Kubernetes on AWS
 
-Your list mentioned Kubernetes. On AWS that's EKS (Elastic Kubernetes Service). The twist: access is governed by *both* IAM and native k8s RBAC, and the boundary between them is where the bugs live.
+Kubernetes on AWS is EKS (Elastic Kubernetes Service). The twist: access is governed by *both* IAM and native k8s RBAC, and the boundary between them is where the bugs live.
 
 get into the cluster
 

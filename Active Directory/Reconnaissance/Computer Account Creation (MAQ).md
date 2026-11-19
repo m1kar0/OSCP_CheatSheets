@@ -4,11 +4,11 @@
 
 ## Discovery
 
-**Method 1: CrackMapExec**
+**Method 1: NetExec**
 
 ```bash
 
-cme ldap 'DC_IP' -d 'DOMAIN' -u 'USER_NAME' -p 'USER_PASS' -M maq
+nxc ldap 'DC_IP' -d 'DOMAIN' -u 'USER_NAME' -p 'USER_PASS' -M maq
 
 ```
 

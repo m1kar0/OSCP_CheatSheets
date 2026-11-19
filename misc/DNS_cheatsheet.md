@@ -65,7 +65,7 @@ TXT - Text records can contain any arbitrary data like SPF records
 This misconfiguration may reveal hiffen domains and hosts behind firewalls and other defences.
 
 ```bash
-# taken from https://book.hacktricks.xyz/
+# taken from https://book.hacktricks.wiki/en/index.html
 
 dig axfr @<DNS_IP> #Try zone transfer without domain
 dig axfr @<DNS_IP> <DOMAIN> #Try zone transfer guessing the domain
